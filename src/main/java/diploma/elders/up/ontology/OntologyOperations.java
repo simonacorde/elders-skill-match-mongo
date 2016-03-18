@@ -78,8 +78,8 @@ public class OntologyOperations {
 
 
         if (ontClass != null) {
-            while (ontClass.getSuperClasses(ontology) != null) {
-                ontClass = ontClass.getSuperClasses(ontology).iterator().next().asOWLClass();
+            for (OWLClassExpression owlClassExpression : ontClass.getSuperClasses(ontology)) {
+                ontClass = owlClassExpression.asOWLClass();
                 if (ontClass.toString().equals(ancestor)) {
                     isAncestor = true;
                 }
@@ -99,9 +99,7 @@ public class OntologyOperations {
         } else {
             depth = 0;
         }
-
-        while (ontClass.getSuperClasses(ontology) != null && ontClass.getSuperClasses(ontology).iterator().hasNext()) {
-            ontClass = ontClass.getSuperClasses(ontology).iterator().next().asOWLClass();
+        for (OWLClassExpression owlClassExpression : ontClass.getSuperClasses(ontology)) {
             depth++;
         }
         return depth;
@@ -138,8 +136,14 @@ public class OntologyOperations {
         return ontClass;
     }
 
+    private String getNameFromOntologyClass(OWLClass ontClass){
+        String [] skillPart1 = ontClass.toString().split("#");
+        String [] skillPart2 = skillPart1[skillPart1.length-1].split(">");
+        return skillPart2[0];
+    }
+
     public boolean areEqual(Skill skill1, Skill skill2) {
-        boolean areEqual = true;
+        boolean areEqual;
         areEqual = skill1.getName().equals(skill2.getName());
         return areEqual;
     }
@@ -153,15 +157,35 @@ public class OntologyOperations {
         OWLClass skill1OntClass = getOntologyClass(skill1.getName());
         OWLClass skill2OntClass = getOntologyClass(skill2.getName());
 
-        while (skill1OntClass.getSuperClasses(getOntology()) != null && !skill1OntClass.getSuperClasses(getOntology()).isEmpty()) {
-            skill1OntClass = skill1OntClass.getSuperClasses(getOntology()).iterator().next().asOWLClass();
-            skill1Parents.add(skill1OntClass.toString());
+        //get all parents of skill until owlThing
+        while(skill1OntClass != null) {
+            if (skill1OntClass.getSuperClasses(getOntology()).iterator().hasNext()) {
+                OWLClassExpression next = skill1OntClass.getSuperClasses(getOntology()).iterator().next();
+                skill1OntClass = next.asOWLClass();
+                skill1Parents.add(getSkillNameFromOWLClass(skill1OntClass));
+            }else{
+                skill1OntClass = null;
+            }
         }
 
-        while (skill2OntClass.getSuperClasses(getOntology()) != null && !skill2OntClass.getSuperClasses(getOntology()).isEmpty()) {
-            skill2OntClass = skill2OntClass.getSuperClasses(getOntology()).iterator().next().asOWLClass();
-            skill2Parents.add(skill1OntClass.toString());
+        while(skill2OntClass != null) {
+            if (skill2OntClass.getSuperClasses(getOntology()).iterator().hasNext()) {
+                OWLClassExpression next = skill2OntClass.getSuperClasses(getOntology()).iterator().next();
+                skill2OntClass = next.asOWLClass();
+                skill2Parents.add(getSkillNameFromOWLClass(skill2OntClass));
+            }else{
+                skill2OntClass = null;
+            }
         }
+//        for (OWLClassExpression owlClassExpression : skill1OntClass.getSuperClasses(getOntology())) {
+//            skill1OntClass = owlClassExpression.asOWLClass();
+//            skill1Parents.add(getSkillNameFromOWLClass(skill1OntClass));
+//        }
+//
+//        for (OWLClassExpression owlClassExpression : skill2OntClass.getSuperClasses(getOntology())) {
+//            skill2OntClass = owlClassExpression.asOWLClass();
+//            skill2Parents.add(getSkillNameFromOWLClass(skill2OntClass));
+//        }
 
         boolean flag = false;
 
@@ -178,7 +202,12 @@ public class OntologyOperations {
             }
         }
         OWLClass leastCAncestorClass = getOntologyClass(leastCommonAncestor);
-        return new Skill(leastCommonAncestor, leastCAncestorClass.getSuperClasses(getOntology()).toString());
+        if(leastCAncestorClass.getSuperClasses(getOntology()).iterator().hasNext()){
+            OWLClass owlClass = leastCAncestorClass.getSuperClasses(getOntology()).iterator().next().asOWLClass();
+            return new Skill(leastCommonAncestor, getNameFromOntologyClass(owlClass));
+        }else {
+            return new Skill(leastCommonAncestor, null);
+        }
     }
 
     public List<Skill> getAncestorHierarchy(Skill parent, Skill child) {
@@ -191,8 +220,8 @@ public class OntologyOperations {
 
         if (parentClass != null && childClass != null) {
 
-            while (childClass.getSuperClasses(getOntology()) != null && !childClass.getSuperClasses(getOntology()).isEmpty()) {
-                childClass = childClass.getSuperClasses(getOntology()).iterator().next().asOWLClass();
+            for (OWLClassExpression owlClassExpression : childClass.getSuperClasses(getOntology())) {
+                childClass = owlClassExpression.asOWLClass();
                 if (childClass.equals(parentClass)) {
                     flag = true;
                     break;

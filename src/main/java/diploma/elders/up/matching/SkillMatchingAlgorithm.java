@@ -113,7 +113,6 @@ public class SkillMatchingAlgorithm {
 //		return Math.abs(milestonOffer - milestonCV) / cvDepth;
 //	}
     private double distance( Skill fromSkill, Skill toSkill) {
-        System.out.println("Distance "+fromSkill.getName() +"   "+toSkill.getName());
         double milestoneToSkill = milestone(toSkill);
         double milestoneFromSkill = milestone(fromSkill);
         double fromDepth = ontologyOperations.getDepth(fromSkill);
@@ -145,6 +144,7 @@ public class SkillMatchingAlgorithm {
 //		if(cvDepth > offDepth){
 //			distance *= 3;
 //		}
+        LOGGER.info("Distance "+fromSkill.getName() +"   "+toSkill.getName() +" is:  "+distance);
         return distance;
     }
     private double milestone(Skill skill) {
