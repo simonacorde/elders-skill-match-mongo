@@ -8,6 +8,8 @@ import diploma.elders.up.dao.entity.Skill;
 import diploma.elders.up.dto.ElderDTO;
 import diploma.elders.up.dto.OpportunityDTO;
 import diploma.elders.up.matching.SkillMatchingAlgorithm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,8 @@ import java.util.*;
 @Service
 public class BirdMatingOptimizerService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(BirdMatingOptimizerService.class);
+
     @Autowired
     private SkillMatchingAlgorithm skillMatchingAlgorithm;
 
@@ -28,7 +32,7 @@ public class BirdMatingOptimizerService {
         double largestMatchingScore = elders.get(0).getMatchingPercentage(); // largest score in elders
         List<Bird> population = initializePopulation(elders);
 
-        while(largestMatchingScore < THRESHOLD){
+        while(largestMatchingScore < THRESHOLD || population.size() < 10){
             classifyPopulation(population);
             List<Bird> newPopulation = new ArrayList<>();
             for(Bird bird : population){
@@ -93,6 +97,7 @@ public class BirdMatingOptimizerService {
             population = newPopulation;
             Collections.sort(population, new BirdComparator());
             largestMatchingScore = population.get(0).getMatchingScore();
+            LOGGER.info("Largest score so far: "+ largestMatchingScore+"  Population size: "+ population.size());
         }
         return population.get(0);
     }

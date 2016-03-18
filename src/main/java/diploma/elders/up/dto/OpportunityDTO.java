@@ -44,4 +44,14 @@ public class OpportunityDTO {
     public Opportunity getOpportunity() {
         return opportunity;
     }
+
+    @Override
+    public String toString() {
+        return "OpportunityDTO{" +
+                "matchingPercentage=" + matchingPercentage +
+                ", skills=" + skills +
+                ", candidates=" + candidates +
+                ", opportunity=" + opportunity +
+                '}';
+    }
 }

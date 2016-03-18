@@ -100,7 +100,7 @@ public class OntologyOperations {
             depth = 0;
         }
 
-        while (ontClass.getSuperClasses(ontology) != null) {
+        while (ontClass.getSuperClasses(ontology) != null && ontClass.getSuperClasses(ontology).iterator().hasNext()) {
             ontClass = ontClass.getSuperClasses(ontology).iterator().next().asOWLClass();
             depth++;
         }

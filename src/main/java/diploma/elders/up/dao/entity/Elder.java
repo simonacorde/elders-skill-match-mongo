@@ -78,7 +78,7 @@ public class Elder {
         this.cardId = cardId;
     }
 
-    @ManyToMany(cascade = CascadeType.MERGE)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinTable(name = "elder_skills", joinColumns = @JoinColumn(name = "id_elder", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "id_skill", referencedColumnName = "id"))
     public Set<Skill> getSkills() {
         return skills;

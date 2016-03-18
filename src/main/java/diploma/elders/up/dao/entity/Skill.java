@@ -69,7 +69,7 @@ public class Skill {
         this.name = name;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "skills")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "skills")
     public Set<SeniorSkill> getSeniorsSkillses() {
         return this.seniorsSkillses;
     }
@@ -78,7 +78,7 @@ public class Skill {
         this.seniorsSkillses = seniorsSkillses;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "skills")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "skills")
     public Set<SkillOpportunity> getSkillsOpportunitieses() {
         return this.skillsOpportunitieses;
     }

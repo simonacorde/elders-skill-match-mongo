@@ -50,4 +50,14 @@ public class SkillDTO {
     public void setSkill(Skill skill) {
         this.skill = skill;
     }
+
+    @Override
+    public String toString() {
+        return "SkillDTO{" +
+                "name='" + name + '\'' +
+                ", matchingSkill=" + matchingSkill +
+                ", matchingScore=" + matchingScore +
+                ", skill=" + skill +
+                '}';
+    }
 }

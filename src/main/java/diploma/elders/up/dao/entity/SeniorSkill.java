@@ -32,7 +32,7 @@ public class SeniorSkill {
         this.id = id;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "skill_id", nullable = false, insertable = false, updatable = false)
     public Skill getSkills() {
         return this.skills;
@@ -42,7 +42,7 @@ public class SeniorSkill {
         this.skills = skills;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "senior_id", nullable = false, insertable = false, updatable = false)
     public Senior getSeniors() {
         return this.seniors;

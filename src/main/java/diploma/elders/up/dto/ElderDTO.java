@@ -36,4 +36,13 @@ public class ElderDTO {
     public Elder getElder() {
         return elder;
     }
+
+    @Override
+    public String toString() {
+        return "ElderDTO{" +
+                "elder=" + elder +
+                ", matchingPercentage=" + matchingPercentage +
+                ", matchingOffers=" + matchingOffers +
+                '}';
+    }
 }

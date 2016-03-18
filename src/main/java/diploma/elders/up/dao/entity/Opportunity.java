@@ -141,7 +141,7 @@ public class Opportunity {
         this.placeOfWork = placeOfWork;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "opportunities")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "opportunities")
     public Set<SkillOpportunity> getSkillsOpportunitieses() {
         return this.skillsOpportunitieses;
     }
@@ -150,7 +150,7 @@ public class Opportunity {
         this.skillsOpportunitieses = skillsOpportunitieses;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "opportunities")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "opportunities")
     public Set<LanguageOpportunity> getLanguagesOpportunitieses() {
         return this.languagesOpportunitieses;
     }
@@ -159,7 +159,7 @@ public class Opportunity {
         this.languagesOpportunitieses = languagesOpportunitieses;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "opportunities")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "opportunities")
     public Set<Matche> getMatcheses() {
         return this.matcheses;
     }

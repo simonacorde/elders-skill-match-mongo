@@ -37,7 +37,7 @@ public class SkillOpportunity {
         this.id = id;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "skill_id", nullable = false, insertable = false, updatable = false)
     public Skill getSkills() {
         return this.skills;
@@ -47,7 +47,7 @@ public class SkillOpportunity {
         this.skills = skills;
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "opportunity_id", nullable = false, insertable = false, updatable = false)
     public Opportunity getOpportunities() {
         return this.opportunities;

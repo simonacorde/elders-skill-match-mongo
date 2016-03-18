@@ -76,4 +76,16 @@ public class Bird {
     public void increaseNrOfMates() {
         this.nrOfMates ++;
     }
+
+    @Override
+    public String toString() {
+        return "Bird{" +
+                "birdGender=" + birdGender +
+                ", birdType=" + birdType +
+                ", matchingScore=" + matchingScore +
+                ", mated=" + mated +
+                ", genes=" + genes +
+                ", nrOfMates=" + nrOfMates +
+                '}';
+    }
 }

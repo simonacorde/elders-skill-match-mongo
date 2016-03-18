@@ -8,6 +8,8 @@ import diploma.elders.up.dao.entity.Skill;
 import diploma.elders.up.dao.entity.SkillOpportunity;
 import diploma.elders.up.dto.*;
 import diploma.elders.up.ontology.OntologyOperations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,10 +21,13 @@ import java.util.Set;
 @Component
 public class SkillMatchingAlgorithm {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SkillMatchingAlgorithm.class);
+
     @Autowired
     private OntologyOperations ontologyOperations;
 
     public double match(OpportunityDTO opp, Set<Skill> skills) {
+        LOGGER.info("Matching nr of skills: "+ skills.size());
         List<SkillDTO> oppSkills = new ArrayList<>();
         List<SkillDTO> elderSkills = new ArrayList<>();
         for(SkillOpportunity skillOpportunity: opp.getOpportunity().getSkillsOpportunitieses()){
@@ -56,6 +61,7 @@ public class SkillMatchingAlgorithm {
         List<ElderDTO> matchingElders = new ArrayList<>();
         for (ElderDTO elder : candidates) {
             double matchScore = match(op, elder.getElder().getSkills());
+            LOGGER.info("Match score between opportunity: "+ op.toString() + " and elder: "+ elder.getElder().toString());
             elder.setMatchingPercentage(matchScore);
             matchingElders.add(elder);
         }
@@ -124,10 +130,12 @@ public class SkillMatchingAlgorithm {
             Skill first = fromSkill;
             //distance = 3 * Math.abs(milestone(first) - milestone(offerSkill));
             for(Skill s: chain){
-                System.out.println("Number of children "+first.getName() +" "+ontologyOperations.numberOfChildren(first));
-                distance += ontologyOperations.numberOfChildren(first) / ontologyOperations.getDepth(first) * Math.abs(milestone(first) - milestone(s));
-                //distance += 3 * Math.abs(milestone(first) - milestone(s));
-                first = s;
+                LOGGER.info("Number of children "+first.getName() +" "+ontologyOperations.numberOfChildren(first));
+                if(ontologyOperations.getDepth(first) != 0) {
+                    distance += ontologyOperations.numberOfChildren(first) / ontologyOperations.getDepth(first) * Math.abs(milestone(first) - milestone(s));
+                    //distance += 3 * Math.abs(milestone(first) - milestone(s));
+                    first = s;
+                }
                 if(distance > 1) distance = 1;
             }
         }

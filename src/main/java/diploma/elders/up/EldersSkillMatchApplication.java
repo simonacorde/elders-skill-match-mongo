@@ -60,8 +60,8 @@ public class EldersSkillMatchApplication {
 //                log.info("CV:" + dataGenerator.generateCV());
 //            }
 //            log.info("Elder: ", seniorRepository.findOne(3).getSkills().toString());
-            dataGenerator.generateOpportunities(5, 15, 7, 18);
-//            matchingService.applyMatchingAlgorithm();
+//            dataGenerator.generateOpportunities(5, 15, 7, 18);
+            matchingService.applyMatchingAlgorithm();
         };
     }
 }

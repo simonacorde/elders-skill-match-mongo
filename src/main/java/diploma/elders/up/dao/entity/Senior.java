@@ -104,7 +104,7 @@ public class Senior {
 
 
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "seniors")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "seniors")
     public List<SeniorSkill> getSeniorsSkillses() {
         return this.seniorsSkillses;
     }
@@ -113,7 +113,7 @@ public class Senior {
         this.seniorsSkillses = seniorsSkillses;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "seniors")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "seniors")
     public List<LanguageSenior> getLanguagesSeniorses() {
         return this.languagesSeniorses;
     }
@@ -122,7 +122,7 @@ public class Senior {
         this.languagesSeniorses = languagesSeniorses;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "seniors")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "seniors")
     public List<User> getUserses() {
         return this.userses;
     }
@@ -131,7 +131,7 @@ public class Senior {
         this.userses = userses;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "seniors")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "seniors")
     public List<Endorsement> getEndorsementses() {
         return this.endorsementses;
     }
@@ -140,7 +140,7 @@ public class Senior {
         this.endorsementses = endorsementses;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "seniors")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "seniors")
     public List<Qualification> getQualificationses() {
         return this.qualificationses;
     }
@@ -149,7 +149,7 @@ public class Senior {
         this.qualificationses = qualificationses;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "seniors")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "seniors")
     public List<Matche> getMatcheses() {
         return this.matcheses;
     }
