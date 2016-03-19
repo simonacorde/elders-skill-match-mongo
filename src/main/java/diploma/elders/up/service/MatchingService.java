@@ -54,7 +54,7 @@ public class MatchingService {
     }
 
     public void applyMatchingAlgorithm(){
-        Opportunity opportunity = opportunityRepository.findOne(5);
+        Opportunity opportunity = opportunityRepository.findOne(7);
         OpportunityDTO opportunityDTO = new OpportunityDTO(opportunity);
         Bird bird = birdMatingOptimizerService.applyBirdMatingOptimizer(computeEldersMatchingWithOpportunity(opportunityDTO, 10), opportunityDTO);
         LOGGER.info("Found for opportunity: " + opportunity.getId() + " the solution containing skills: " + bird.getGenes() + " with matching score: " + bird.getMatchingScore());

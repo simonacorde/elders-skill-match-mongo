@@ -3,6 +3,8 @@ package diploma.elders.up.data;
 import diploma.elders.up.dao.entity.*;
 import diploma.elders.up.dao.repository.*;
 import diploma.elders.up.ontology.OntologyOperations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +15,8 @@ import java.util.*;
  */
 @Component
 public class DataGenerator {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataGenerator.class);
 
     private static final int MIN_ID = 13387;
     private static final int MAX_ID = 26772;
@@ -75,7 +79,7 @@ public class DataGenerator {
         opportunity.setTitle("Perfect");
         opportunity.setStartDate("now");
         opportunity.setPlaceOfWork("The Office");
-        Opportunity saved = opportunityRepository.save(opportunity);
+        Opportunity save = opportunityRepository.save(opportunity);
         int nrOfUnrelatedSkills = randomNumber(minUnrelatedSkills, maxUnrelatedSkills);
         Set<SkillOpportunity> skillOpportunities = new HashSet<>();
         for(int i=0; i< nrOfUnrelatedSkills; i++){
@@ -102,8 +106,10 @@ public class DataGenerator {
             skillOpportunities.add(skillOpportunity);
             i++;
         }
-        saved.setSkillsOpportunitieses(skillOpportunities);
-        opportunityRepository.save(saved);
+        LOGGER.info("Saved opp id: " + save.getId());
+        Opportunity one = opportunityRepository.findOne(save.getId());
+        one.setSkillsOpportunitieses(skillOpportunities);
+        opportunityRepository.save(one);
 
         return skillOpportunities;
     }
