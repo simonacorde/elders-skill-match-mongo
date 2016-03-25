@@ -26,13 +26,13 @@ public class BirdMatingOptimizerService {
     @Autowired
     private SkillMatchingAlgorithm skillMatchingAlgorithm;
 
-    private static final double THRESHOLD = 0.90;
+    private static final double THRESHOLD = 0.50;
 
     public Bird applyBirdMatingOptimizer(List<ElderDTO> elders, OpportunityDTO opportunity){
         double largestMatchingScore = elders.get(0).getMatchingPercentage(); // largest score in elders
         List<Bird> population = initializePopulation(elders);
 
-        while(largestMatchingScore < THRESHOLD || population.size() < 10){
+        while(largestMatchingScore <= THRESHOLD){
             classifyPopulation(population);
             List<Bird> newPopulation = new ArrayList<>();
             for(Bird bird : population){
@@ -126,7 +126,7 @@ public class BirdMatingOptimizerService {
         Random rng = new Random();
         List<Integer> generated = new ArrayList<>();
         while (generated.size() < nrOfRandomBirds) {
-            Integer next = rng.nextInt(birds.size()) + 1;
+            Integer next = rng.nextInt(birds.size());
             if(birds.get(next).getBirdGender().equals(BirdGender.FEMALE) && !birds.get(next).isMated()) {
                 generated.add(next);
             }
@@ -138,7 +138,7 @@ public class BirdMatingOptimizerService {
         Random rng = new Random();
         List<Integer> generated = new ArrayList<>();
         while (generated.size() < nrOfRandomBirds) {
-            Integer next = rng.nextInt(birds.size()) + 1;
+            Integer next = rng.nextInt(birds.size());
             if(birds.get(next).getBirdGender().equals(BirdGender.FEMALE) && birds.get(next).getNrOfMates() < nrOfMates) {
                 generated.add(next);
             }

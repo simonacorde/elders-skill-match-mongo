@@ -7,7 +7,7 @@ package diploma.elders.up.matching;
 import diploma.elders.up.dao.entity.Skill;
 import diploma.elders.up.dao.entity.SkillOpportunity;
 import diploma.elders.up.dto.*;
-import diploma.elders.up.ontology.OntologyOperations;
+import diploma.elders.up.ontology.OntologyLikeOperations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +23,10 @@ public class SkillMatchingAlgorithm {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SkillMatchingAlgorithm.class);
 
+//    @Autowired
+//    private OntologyOperations ontologyOperations;
     @Autowired
-    private OntologyOperations ontologyOperations;
+    private OntologyLikeOperations ontologyOperations;
 
     public double match(OpportunityDTO opp, Set<Skill> skills) {
         LOGGER.info("Matching nr of skills: "+ skills.size());

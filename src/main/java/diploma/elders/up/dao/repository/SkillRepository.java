@@ -11,4 +11,5 @@ import java.util.List;
 public interface SkillRepository extends CrudRepository<Skill, Integer> {
 
     List<Skill> findByName(String name);
+    List<Skill> findByParentName(String parent);
 }
