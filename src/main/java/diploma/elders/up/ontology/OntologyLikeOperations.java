@@ -1,16 +1,14 @@
 package diploma.elders.up.ontology;
 
-import diploma.elders.up.dao.entity.Skill;
-import diploma.elders.up.dao.repository.ElderRepository;
+import diploma.elders.up.dao.documents.Skill;
 import diploma.elders.up.dao.repository.OpportunityRepository;
-import diploma.elders.up.dao.repository.SkillOpportunityRepository;
+import diploma.elders.up.dao.repository.SeniorRepository;
 import diploma.elders.up.dao.repository.SkillRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Created by Simonas on 3/23/2016.
@@ -25,9 +23,7 @@ public class OntologyLikeOperations {
     @Autowired
     private SkillRepository skillRepository;
     @Autowired
-    private ElderRepository elderRepository;
-    @Autowired
-    private SkillOpportunityRepository skillOpportunityRepository;
+    private SeniorRepository elderRepository;
     @Autowired
     private OpportunityRepository opportunityRepository;
 
@@ -38,8 +34,8 @@ public class OntologyLikeOperations {
         boolean isAncestor = false;
 
         String childTemp = child;
-        while (childTemp != null && !THING.equals(childTemp) && getParentSkillName(childTemp).isPresent()) {
-            childTemp = getParentSkillName(childTemp).get().getParentName();
+        while (childTemp != null && !THING.equals(childTemp) && getParentSkillName(childTemp) != null) {
+            childTemp = getParentSkillName(childTemp).getParent();
             if (childTemp.equals(ancestor)) {
                 isAncestor = true;
             }
@@ -57,8 +53,8 @@ public class OntologyLikeOperations {
         } else {
             depth = 0;
         }
-        while (skillName != null && !THING.equals(skillName)  && getParentSkillName(skillName).isPresent()) {
-            skillName = getParentSkillName(skillName).get().getParentName();
+        while (skillName != null && !THING.equals(skillName)  && getParentSkillName(skillName) != null) {
+            skillName = getParentSkillName(skillName).getParent();
             depth++;
         }
         return depth;
@@ -84,13 +80,13 @@ public class OntologyLikeOperations {
         String skill2OntClass = skill2.getName();
 
         //get all parents of skill until owlThing
-        while(skill1OntClass != null && !THING.equals(skill1OntClass)  && getParentSkillName(skill1OntClass).isPresent()) {
-            skill1OntClass = getParentSkillName(skill1OntClass).get().getParentName();
+        while(skill1OntClass != null && !THING.equals(skill1OntClass)  && getParentSkillName(skill1OntClass) != null) {
+            skill1OntClass = getParentSkillName(skill1OntClass).getParent();
             skill1Parents.add(skill1OntClass);
         }
 
-        while(skill2OntClass != null && !THING.equals(skill2OntClass)  && getParentSkillName(skill2OntClass).isPresent()) {
-            skill2OntClass = getParentSkillName(skill2OntClass).get().getParentName();
+        while(skill2OntClass != null && !THING.equals(skill2OntClass)  && getParentSkillName(skill2OntClass) != null) {
+            skill2OntClass = getParentSkillName(skill2OntClass).getParent();
             skill2Parents.add(skill2OntClass);
         }
 
@@ -108,10 +104,10 @@ public class OntologyLikeOperations {
                 break;
             }
         }
-        if(getParentSkillName(leastCommonAncestor).isPresent()) {
-            return new Skill(leastCommonAncestor, getParentSkillName(leastCommonAncestor).get().getParentName());
+        if(getParentSkillName(leastCommonAncestor) != null) {
+            return new Skill("1",leastCommonAncestor, getParentSkillName(leastCommonAncestor).getParent());
         }else {
-            return new Skill(leastCommonAncestor, null);
+            return new Skill("1",leastCommonAncestor, null);
         }
     }
 
@@ -122,14 +118,14 @@ public class OntologyLikeOperations {
         String childClass = child.getName();
 
         boolean flag = false;
-        while(childClass != null && !THING.equals(childClass) && getParentSkillName(childClass).isPresent()) {
-            childClass = getParentSkillName(childClass).get().getParentName();
+        while(childClass != null && !THING.equals(childClass) && getParentSkillName(childClass) != null) {
+            childClass = getParentSkillName(childClass).getParent();
             if (childClass.equals(parentClass)) {
                 flag = true;
                 break;
             }
-            if(getParentSkillName(childClass).isPresent()) {
-                Skill childSkill = new Skill(childClass, getParentSkillName(childClass).get().getParentName());
+            if(getParentSkillName(childClass) != null) {
+                Skill childSkill = new Skill("1",childClass, getParentSkillName(childClass).getParent());
                 ancestors.add(0, childSkill);
             }
         }
@@ -141,8 +137,17 @@ public class OntologyLikeOperations {
 
     }
 
-    private Optional<Skill> getParentSkillName(String childName){
-        return skillRepository.findByName(childName).stream().findFirst();
+    public List<String> getAllChildren(Skill skill) {
+        List<String> children = new ArrayList<>();
+        List<Skill> skills = getSubclasses(skill.getName());
+        for(Skill skillChild: skills){
+            children.add(skillChild.getName());
+        }
+        return children;
+    }
+
+    private Skill getParentSkillName(String childName){
+        return skillRepository.findByName(childName);
     }
 
     private List<Skill> getSubclasses(String name){

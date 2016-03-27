@@ -4,8 +4,7 @@ package diploma.elders.up.matching;
  * Created by Simonas on 2/29/2016.
  */
 
-import diploma.elders.up.dao.entity.Skill;
-import diploma.elders.up.dao.entity.SkillOpportunity;
+import diploma.elders.up.dao.documents.Skill;
 import diploma.elders.up.dto.*;
 import diploma.elders.up.ontology.OntologyLikeOperations;
 import org.slf4j.Logger;
@@ -16,24 +15,21 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 @Component
 public class SkillMatchingAlgorithm {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SkillMatchingAlgorithm.class);
 
-//    @Autowired
-//    private OntologyOperations ontologyOperations;
     @Autowired
     private OntologyLikeOperations ontologyOperations;
 
-    public double match(OpportunityDTO opp, Set<Skill> skills) {
+    public double match(OpportunityDTO opp, List<Skill> skills) {
         LOGGER.info("Matching nr of skills: "+ skills.size());
         List<SkillDTO> oppSkills = new ArrayList<>();
         List<SkillDTO> elderSkills = new ArrayList<>();
-        for(SkillOpportunity skillOpportunity: opp.getOpportunity().getSkillsOpportunitieses()){
-            oppSkills.add(new SkillDTO(skillOpportunity.getSkills()));
+        for(Skill skillOpportunity: opp.getOpportunity().getSkills()){
+            oppSkills.add(new SkillDTO(skillOpportunity));
         }
         for(Skill skill: skills){
             elderSkills.add(new SkillDTO(skill));

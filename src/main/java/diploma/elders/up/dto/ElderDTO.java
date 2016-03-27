@@ -1,6 +1,7 @@
 package diploma.elders.up.dto;
 
-import diploma.elders.up.dao.entity.Elder;
+
+import diploma.elders.up.dao.documents.Senior;
 
 import java.util.List;
 
@@ -9,11 +10,11 @@ import java.util.List;
  */
 public class ElderDTO {
 
-    private Elder elder;
+    private Senior elder;
     private double matchingPercentage;
     private List<OpportunityDTO> matchingOffers;
 
-    public ElderDTO(Elder elder) {
+    public ElderDTO(Senior elder) {
         this.elder = elder;
     }
 
@@ -33,7 +34,7 @@ public class ElderDTO {
         this.matchingOffers = matchingOffers;
     }
 
-    public Elder getElder() {
+    public Senior getElder() {
         return elder;
     }
 

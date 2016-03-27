@@ -1,6 +1,6 @@
 package diploma.elders.up.dto;
 
-import diploma.elders.up.dao.entity.Opportunity;
+import diploma.elders.up.dao.documents.Opportunity;
 
 import java.util.List;
 
@@ -9,7 +9,6 @@ import java.util.List;
  */
 public class OpportunityDTO {
     private double matchingPercentage;
-    private List<SkillDTO> skills;
     private List<ElderDTO> candidates;
     private Opportunity opportunity;
 
@@ -23,14 +22,6 @@ public class OpportunityDTO {
 
     public void setMatchingPercentage(double matchingPercentage) {
         this.matchingPercentage = matchingPercentage;
-    }
-
-    public List<SkillDTO> getSkills() {
-        return skills;
-    }
-
-    public void setSkills(List<SkillDTO> skills) {
-        this.skills = skills;
     }
 
     public List<ElderDTO> getCandidates() {
@@ -49,7 +40,6 @@ public class OpportunityDTO {
     public String toString() {
         return "OpportunityDTO{" +
                 "matchingPercentage=" + matchingPercentage +
-                ", skills=" + skills +
                 ", candidates=" + candidates +
                 ", opportunity=" + opportunity +
                 '}';

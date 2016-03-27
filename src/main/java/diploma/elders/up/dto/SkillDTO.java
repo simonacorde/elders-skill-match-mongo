@@ -1,30 +1,18 @@
 package diploma.elders.up.dto;
 
-import diploma.elders.up.dao.entity.Skill;
+import diploma.elders.up.dao.documents.Skill;
 
 /**
  * Created by Simonas on 3/2/2016.
  */
 public class SkillDTO {
-    private String name;
+
     private SkillDTO matchingSkill;
     private double matchingScore;
     private Skill skill;
 
     public SkillDTO(Skill skill) {
         this.skill = skill;
-    }
-
-    public SkillDTO(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public SkillDTO getMatchingSkill() {
@@ -54,8 +42,7 @@ public class SkillDTO {
     @Override
     public String toString() {
         return "SkillDTO{" +
-                "name='" + name + '\'' +
-                ", matchingSkill=" + matchingSkill +
+                "matchingSkill=" + matchingSkill +
                 ", matchingScore=" + matchingScore +
                 ", skill=" + skill +
                 '}';

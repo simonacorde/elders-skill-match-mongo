@@ -1,6 +1,6 @@
 package diploma.elders.up;
 
-import diploma.elders.up.dao.repository.ElderRepository;
+import diploma.elders.up.dao.repository.SeniorRepository;
 import diploma.elders.up.dao.repository.SkillRepository;
 import diploma.elders.up.data.DataGenerator;
 import diploma.elders.up.ontology.OntologyReader;
@@ -12,8 +12,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 @SpringBootApplication
+@EnableMongoRepositories
 public class EldersSkillMatchApplication {
 
     private static final Logger log = LoggerFactory.getLogger(EldersSkillMatchApplication.class);
@@ -29,7 +31,7 @@ public class EldersSkillMatchApplication {
     @Autowired
     private DataGenerator dataGenerator;
     @Autowired
-    private ElderRepository seniorRepository;
+    private SeniorRepository seniorRepository;
     @Autowired
     private MatchingService matchingService;
 
@@ -47,21 +49,19 @@ public class EldersSkillMatchApplication {
 //                log.info(skill.toString());
 //            }
 //            log.info("Nr of nodes: "+nodes);
-//
-//             //fetch customers by last name
-//            log.info("Skill found with findByName('\"<http://www.semanticweb.org/ontologies/skills-ontology#Biometry>\"'):");
-//            log.info("--------------------------------------------");
-//            for (Skill bauer : repository.findByName("<http://www.semanticweb.org/ontologies/skills-ontology#Biometry>")) {
-//                log.info(bauer.toString());
-//            }
-//            log.info("");
+            log.info("nr of skills in db: " + repository.findAll().size());
 //
 //            for(int i = 0; i < 9999; i++) {
 //                log.info("CV:" + dataGenerator.generateCV());
 //            }
-//            log.info("Elder: ", seniorRepository.findOne(3).getSkills().toString());
+//            List<Senior> all = seniorRepository.findAll();
+//            log.info("Nr of elders: ", seniorRepository.findAll().size());
+//            log.info("Elder: ", all.get(0).toString());
+//            for(Senior senior : all) {
+//                log.info("Elder: ", senior.getId());
+//            }
 //            dataGenerator.generateOpportunities(5, 8, 7, 10);
-            matchingService.applyMatchingAlgorithm();
+//            matchingService.applyMatchingAlgorithm();
         };
     }
 }

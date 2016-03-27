@@ -1,6 +1,6 @@
 package diploma.elders.up.ontology;
 
-import diploma.elders.up.dao.entity.Skill;
+import diploma.elders.up.dao.documents.Skill;
 import diploma.elders.up.dao.repository.SkillRepository;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
@@ -58,6 +58,7 @@ public class OntologyReader {
 
     public int generateRepository(OWLOntology ontology, SkillRepository skillRepository){
         int nodes=0;
+        Integer id = 0;
         Set<OWLClass> entitySet=ontology.getClassesInSignature();
         for(OWLClass o : entitySet )
         {
@@ -68,7 +69,8 @@ public class OntologyReader {
             String [] parentPart2 = parentPart1[parentPart1.length-1].split(">");
 
             log.info(skillPart2[0] + " has parent " +parentPart2[0]);
-            skillRepository.save(new Skill(skillPart2[0], parentPart2[0]));
+            skillRepository.save(new Skill(String.valueOf(id), skillPart2[0], parentPart2[0]));
+            id++;
             nodes++;
             log.info(o + "  has node parent:  " + o.getSuperClasses(ontology));
         }
