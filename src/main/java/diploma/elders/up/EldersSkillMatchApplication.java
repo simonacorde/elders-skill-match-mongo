@@ -56,11 +56,11 @@ public class EldersSkillMatchApplication {
 //            }
 //            List<Senior> all = seniorRepository.findAll();
 //            log.info("Nr of elders: ", seniorRepository.findAll().size());
-//            log.info("Elder: ", all.get(0).toString());
+            log.info("Elder: ", seniorRepository.findOne("56f8328eecdb7333903c1e3e").getName());
 //            for(Senior senior : all) {
 //                log.info("Elder: ", senior.getId());
 //            }
-//            dataGenerator.generateOpportunities(5, 8, 7, 10);
+            dataGenerator.generateOpportunity(5, 8, 7, 10);
 //            matchingService.applyMatchingAlgorithm();
         };
     }

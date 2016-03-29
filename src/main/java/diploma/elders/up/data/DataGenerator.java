@@ -76,17 +76,15 @@ public class DataGenerator {
         return skills;
     }
 
-    public List<Opportunity> generateOpportunities(int minUnrelatedSkills, int maxUnrelatedSkills, int minRelatedSkills, int maxRelatedSkills) {
+    public Opportunity generateOpportunity(int minUnrelatedSkills, int maxUnrelatedSkills, int minRelatedSkills, int maxRelatedSkills) {
         Company company = companyRepository.findAll().get(0);
         Opportunity opportunity = new Opportunity("opportunity", company);
-        Opportunity save = opportunityRepository.save(opportunity);
+        Opportunity saved = opportunityRepository.save(opportunity);
         int nrOfUnrelatedSkills = randomNumber(minUnrelatedSkills, maxUnrelatedSkills);
-        List<Opportunity> skillOpportunities = new ArrayList<>();
+        List<Skill> skills = new ArrayList<>();
         for(int i=0; i< nrOfUnrelatedSkills; i++){
             Skill skill = skillRepository.findOne(""+randomNumber(MIN_ID, MAX_ID));
-            //Opportunity skillOpportunity = new Opportunity(new Skill(skill.getId(), opportunity), skill, opportunity);
-            opportunityRepository.save(skillOpportunities);
-            //skillOpportunities.add(skillOpportunity);
+            skills.add(skill);
         }
 
         int randomSkill = randomNumber(MIN_ID, MAX_ID);
@@ -99,19 +97,17 @@ public class DataGenerator {
         allSkills.addAll(allChildren);
         int nrOfRelatedSkills = randomNumber(minRelatedSkills, maxRelatedSkills);
         int i=0;
-//        while(i < allSkills.size() && i <= nrOfRelatedSkills){
-//            Skill skill = skillRepository.findByName(allSkills.get(i)).get(0);
-//            SkillOpportunity skillOpportunity = new SkillOpportunity(new SkillOpportunityId(skill.getId(), opportunity.getId()), skill, opportunity);
-//            skillOpportunityRepository.save(skillOpportunities);
-//            skillOpportunities.add(skillOpportunity);
-//            i++;
-//        }
-//        LOGGER.info("Saved opp id: " + save.getId());
-//        Opportunity one = opportunityRepository.findOne(save.getId());
-//        one.setSkillsOpportunitieses(skillOpportunities);
-//        opportunityRepository.save(one);
+        while(i < allSkills.size() && i <= nrOfRelatedSkills){
+            Skill skill = skillRepository.findByName(allSkills.get(i));
+            skills.add(skill);
+            i++;
+        }
+        LOGGER.info("Saved opp id: " + saved.getId());
+        Opportunity one = opportunityRepository.findOne(saved.getId());
+        one.setSkills(skills);
+        Opportunity opp = opportunityRepository.save(one);
 
-        return skillOpportunities;
+        return opp;
     }
 
 
