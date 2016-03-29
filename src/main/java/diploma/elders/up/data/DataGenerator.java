@@ -76,6 +76,11 @@ public class DataGenerator {
         return skills;
     }
 
+    public Company generateCompany(){
+        Company company = new Company("Nicusor");
+        return companyRepository.save(company);
+    }
+
     public Opportunity generateOpportunity(int minUnrelatedSkills, int maxUnrelatedSkills, int minRelatedSkills, int maxRelatedSkills) {
         Company company = companyRepository.findAll().get(0);
         Opportunity opportunity = new Opportunity("opportunity", company);

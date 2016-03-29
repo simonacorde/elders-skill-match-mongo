@@ -60,8 +60,9 @@ public class EldersSkillMatchApplication {
 //            for(Senior senior : all) {
 //                log.info("Elder: ", senior.getId());
 //            }
-            dataGenerator.generateOpportunity(5, 8, 7, 10);
-//            matchingService.applyMatchingAlgorithm();
+//            Company company = dataGenerator.generateCompany();
+//            dataGenerator.generateOpportunity(5, 8, 7, 10);
+            matchingService.applyMatchingAlgorithm();
         };
     }
 }

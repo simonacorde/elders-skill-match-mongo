@@ -1,6 +1,8 @@
 package diploma.elders.up.service;
 
 import diploma.elders.up.bird.optimizer.BirdMatingOptimizerService;
+import diploma.elders.up.bird.optimizer.domain.Bird;
+import diploma.elders.up.dao.documents.Opportunity;
 import diploma.elders.up.dao.documents.Senior;
 import diploma.elders.up.dao.repository.OpportunityRepository;
 import diploma.elders.up.dao.repository.SeniorRepository;
@@ -51,10 +53,10 @@ public class MatchingService {
         return skillMatchingAlgorithm.findMatchingCandidates(opportunity, eldersMatched, size);
     }
 
-//    public void applyMatchingAlgorithm(){
-//        Opportunity opportunity = opportunityRepository.findOne();
-//        OpportunityDTO opportunityDTO = new OpportunityDTO(opportunity);
-//        Bird bird = birdMatingOptimizerService.applyBirdMatingOptimizer(computeEldersMatchingWithOpportunity(opportunityDTO, 20), opportunityDTO);
-//        LOGGER.info("Found for opportunity: " + opportunity.getId() + " the solution containing skills: " + bird.getGenes() + " with matching score: " + bird.getMatchingScore());
-//    }
+    public void applyMatchingAlgorithm(){
+        Opportunity opportunity = opportunityRepository.findAll().get(0);
+        OpportunityDTO opportunityDTO = new OpportunityDTO(opportunity);
+        Bird bird = birdMatingOptimizerService.applyBirdMatingOptimizer(computeEldersMatchingWithOpportunity(opportunityDTO, 20), opportunityDTO);
+        LOGGER.info("Found for opportunity: " + opportunity.getId() + " the solution containing skills: " + bird.getGenes() + " with matching score: " + bird.getMatchingScore());
+    }
 }
