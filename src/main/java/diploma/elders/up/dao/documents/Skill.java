@@ -40,4 +40,25 @@ public class Skill {
                 ", parentName='" + parentName + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Skill skill = (Skill) o;
+
+        if (id != null ? !id.equals(skill.id) : skill.id != null) return false;
+        if (name != null ? !name.equals(skill.name) : skill.name != null) return false;
+        return !(parentName != null ? !parentName.equals(skill.parentName) : skill.parentName != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (parentName != null ? parentName.hashCode() : 0);
+        return result;
+    }
 }

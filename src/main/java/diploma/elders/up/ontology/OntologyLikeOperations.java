@@ -27,6 +27,36 @@ public class OntologyLikeOperations {
     @Autowired
     private OpportunityRepository opportunityRepository;
 
+
+    public int getDistance(String skill1, String skill2) {
+        List<String> classesList1 = new ArrayList<>();
+        List<String> classesList2 = new ArrayList<>();
+
+
+        String parent1 = null;
+        String parent2 = null;
+        classesList1.add(skill1);
+        classesList2.add(skill2);
+        String class1 = skill1;
+        String class2 = skill2;
+        do {
+            parent1 = getParent(class1).getName();
+            if (!parent1.equals(THING)) {
+                classesList1.add(parent1);
+                class1 = parent1;
+
+            }
+            parent2 = getParent(class2).getName();
+            if (!parent2.equals(THING) && !classesList1.contains(class2)) {
+                classesList2.add(parent2);
+                class2 = parent2;
+            }
+        }
+        while (!classesList2.contains(class1) && !classesList1.contains(class2) && (!THING.equals(parent1) || !THING.equals(parent2)));
+
+        return classesList1.size()-1 + classesList2.size() - 1;
+    }
+
     public boolean isAncestor(Skill ancestorSkill, Skill childSkill){
         String ancestor = ancestorSkill.getName();
         String child = childSkill.getName();
@@ -105,9 +135,9 @@ public class OntologyLikeOperations {
             }
         }
         if(getParentSkillName(leastCommonAncestor) != null) {
-            return new Skill("1",leastCommonAncestor, getParentSkillName(leastCommonAncestor).getParent());
+            return skillRepository.findByName(leastCommonAncestor);
         }else {
-            return new Skill("1",leastCommonAncestor, null);
+            return null;
         }
     }
 
@@ -148,6 +178,11 @@ public class OntologyLikeOperations {
 
     private Skill getParentSkillName(String childName){
         return skillRepository.findByName(childName);
+    }
+
+    private Skill getParent(String childName){
+        String parent = skillRepository.findByName(childName).getParent();
+        return skillRepository.findByName(parent);
     }
 
     private List<Skill> getSubclasses(String name){

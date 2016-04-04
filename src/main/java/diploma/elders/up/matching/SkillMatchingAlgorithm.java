@@ -52,7 +52,9 @@ public class SkillMatchingAlgorithm {
             count++;
             scoreSum += maxScore;
         }
-        return scoreSum / count;
+        double v = scoreSum / count;
+        LOGGER.info("Returned match: {}", v);
+        return v;
     }
 
     public List<ElderDTO> findMatchingCandidates(OpportunityDTO op, List<ElderDTO> candidates, int size) {
@@ -87,7 +89,7 @@ public class SkillMatchingAlgorithm {
         return matchingOpps;
     }
 
-    private double matchSkills(Skill fromSkill, Skill toSkill) {
+    public double matchSkills(Skill fromSkill, Skill toSkill) {
         System.out.println("Matching "+fromSkill.getName() +"   "+toSkill.getName());
         if (ontologyOperations.areEqual(toSkill, fromSkill)) {
             return 1;
@@ -99,9 +101,14 @@ public class SkillMatchingAlgorithm {
 
         Skill parentSkill = ontologyOperations.getLeastCommonAncestor(toSkill, fromSkill);
         //return 1 - (distance(offerSkill, parentSkill) + distance(cvSkill, parentSkill));
-        double distance = (distance(fromSkill, parentSkill) + distance(parentSkill,toSkill));
-        if(distance > 1) return 0;
-        return 1 - distance;
+        if (parentSkill!=null){
+            double distance = (distance(fromSkill, parentSkill) + distance(parentSkill,toSkill));
+            if(distance > 1) {
+                return 0;
+            }
+            return 1 - distance;
+        }
+        return 0;
     }
 
     //	private double distance(Skill offerSkill, Skill cvSkill) {
