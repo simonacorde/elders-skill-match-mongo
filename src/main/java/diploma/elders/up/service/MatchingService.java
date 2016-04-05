@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by Simonas on 3/5/2016.
@@ -48,7 +49,7 @@ public class MatchingService {
         return randomList(elders, size);
     }
 
-    public List<ElderDTO> computeEldersMatchingWithOpportunity(OpportunityDTO opportunity, int size){
+    public List<ElderDTO> computeEldersMatchingWithOpportunity(OpportunityDTO opportunity, int size) throws ExecutionException, InterruptedException {
         List<Senior> elders = getElderCVs(size);
         List<ElderDTO> eldersMatched = new ArrayList<>();
         for(Senior elder : elders){
@@ -58,7 +59,7 @@ public class MatchingService {
         return semanticMatchingAlgorithm.findMatchingCandidates(opportunity, eldersMatched, size);
     }
 
-    public void applyMatchingAlgorithm(int size) throws NoSuchBirdException {
+    public void applyMatchingAlgorithm(int size) throws NoSuchBirdException, ExecutionException, InterruptedException {
         Opportunity opportunity = opportunityRepository.findAll().get(0);
         OpportunityDTO opportunityDTO = new OpportunityDTO(opportunity);
         Bird bird = birdMatingOptimizerService.applyBirdMatingOptimizer(computeEldersMatchingWithOpportunity(opportunityDTO, size), opportunityDTO);

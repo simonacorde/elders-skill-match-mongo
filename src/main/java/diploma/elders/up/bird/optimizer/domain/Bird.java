@@ -75,6 +75,11 @@ public class Bird {
 
     public void increaseNrOfMates() {
         this.nrOfMates ++;
+        if(this.getBirdType().equals(BirdType.MONOGAMOUS) && this.nrOfMates >= 1){
+            this.mated = true;
+        }else if(this.getBirdType().equals(BirdType.POLYGYNOUS) && this.nrOfMates >= 3){
+            this.mated = true;
+        }
     }
 
     @Override

@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
-public class SkillMatchingAlgorithm {
+public class SkillMatchingAlgorithm implements OntologyMatching{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SkillMatchingAlgorithm.class);
 
@@ -134,7 +134,6 @@ public class SkillMatchingAlgorithm {
             Skill first = fromSkill;
             //distance = 3 * Math.abs(milestone(first) - milestone(offerSkill));
             for(Skill s: chain){
-                LOGGER.info("Number of children "+first.getName() +" "+ontologyOperations.numberOfChildren(first));
                 if(ontologyOperations.getDepth(first) != 0) {
                     distance += ontologyOperations.numberOfChildren(first) / ontologyOperations.getDepth(first) * Math.abs(milestone(first) - milestone(s));
                     //distance += 3 * Math.abs(milestone(first) - milestone(s));
@@ -149,7 +148,6 @@ public class SkillMatchingAlgorithm {
 //		if(cvDepth > offDepth){
 //			distance *= 3;
 //		}
-        LOGGER.info("Distance "+fromSkill.getName() +"   "+toSkill.getName() +" is:  "+distance);
         return distance;
     }
     private double milestone(Skill skill) {

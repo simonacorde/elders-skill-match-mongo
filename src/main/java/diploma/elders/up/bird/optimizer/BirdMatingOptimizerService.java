@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Simonas on 3/5/2016.
@@ -29,86 +30,27 @@ public class BirdMatingOptimizerService {
     private static final double THRESHOLD = 0.80;
     private static final int FEMALE_MATES = 3;
     private static final double MONOGAMOUS_BIRDS_PERCENTAGE = 0.5;
-    private static final double MALE__POLYGYNY_BIRDS_PERCENTAGE = 0.3;
+    private static final double MALE_POLYGYNY_BIRDS_PERCENTAGE = 0.3;
+    private static final int RANDOM_FEMALES_TO_MATE = 10;
 
     public Bird applyBirdMatingOptimizer(List<ElderDTO> elders, OpportunityDTO opportunity) throws NoSuchBirdException {
         double largestMatchingScore = elders.get(0).getMatchingPercentage(); // largest score in elders
         List<Bird> population = initializePopulation(elders);
 
-        while(largestMatchingScore <= THRESHOLD && areThereAnyUnmatedBrids(population)){
+        while(largestMatchingScore <= THRESHOLD && areThereAnyUnmatedBrids(population) && !population.isEmpty()){
             classifyPopulation(population);
             List<Bird> newPopulation = new ArrayList<>();
-            for(int i=0; i< population.size(); i++) {
-                if(population.get(i).getBirdGender().equals(BirdGender.MALE)) {
-                    if (population.get(i).getBirdType().equals(BirdType.MONOGAMOUS)) {
-                        List<Integer> femalePositions = randomUnmatedFemaleBirdsFromPopulation(population.subList(0, population.size() / 2), 10);
-                        if (femalePositions.isEmpty()) {
-                            throw new NoSuchBirdException("There are no more unmated monogamous female birds!");
-                        }
-                        Map<Integer, Bird> females = new HashMap<>();
-                        for (Integer position : femalePositions) {
-                            females.put(position, population.get(position));
-                        }
-                        Bird maxMatchingScoreFemale = getMaxMatchingScore(females);
-                        int positionOfFemaleBird = 0;
-                        for (Map.Entry<Integer, Bird> entry : females.entrySet()) {
-                            if (Objects.equals(maxMatchingScoreFemale, entry.getValue())) {
-                                positionOfFemaleBird = entry.getKey();
-                            }
-                        }
-                        population.get(positionOfFemaleBird).setMated(true);
-                        population.get(i).setMated(true);
-                        Bird brood = new Bird();
-                        brood.setMated(false);
-                        brood.addGenes(union(population.get(i).getGenes(), population.get(positionOfFemaleBird).getGenes()));
-                        //compute new matching after mating
-                        List<Skill> broodAllSkills = new ArrayList<>();
-                        for (ElderDTO elderDTO : brood.getGenes()) {
-                            broodAllSkills.addAll(elderDTO.getElder().getSkills());
-                        }
-                        double match = semanticMatchingAlgorithm.match(opportunity, broodAllSkills);
-                        brood.setMatchingScore(match);
-                        newPopulation.add(brood);
-                        for (int j = 0; j < population.size(); j++) {
-                            if (j != i && j != positionOfFemaleBird)
-                                newPopulation.add(population.get(j));
-                        }
-                    } else {
-                        List<Integer> femalePositions = randomFemaleBirdsFromPopulationWithLessThanNrOfMates(population.subList(0, population.size() / 2), 10, FEMALE_MATES);
-                        if (femalePositions.isEmpty()) {
-                            throw new NoSuchBirdException("There are no more unmated polygynyous female birds!");
-                        }
-                        Map<Integer, Bird> females = new HashMap<>();
-                        for (Integer position : femalePositions) {
-                            females.put(position, population.get(position));
-                        }
-                        Bird maxMatchingScoreFemale = getMaxMatchingScore(females);
-                        int positionOfFemaleBird = 0;
-                        for (Map.Entry<Integer, Bird> entry : females.entrySet()) {
-                            if (Objects.equals(maxMatchingScoreFemale, entry.getValue())) {
-                                positionOfFemaleBird = entry.getKey();
-                            }
-                        }
-                        population.get(positionOfFemaleBird).increaseNrOfMates();
-                        population.get(i).setMated(true);
-                        Bird brood = new Bird();
-                        brood.setMated(false);
-                        brood.addGenes(union(population.get(i).getGenes(), population.get(positionOfFemaleBird).getGenes()));
-                        //compute new matching after mating
-                        List<Skill> broodAllSkills = new ArrayList<>();
-                        for (ElderDTO elderDTO : brood.getGenes()) {
-                            broodAllSkills.addAll(elderDTO.getElder().getSkills());
-                        }
-                        double match = semanticMatchingAlgorithm.match(opportunity, broodAllSkills);
-                        brood.setMatchingScore(match);
-                        newPopulation.add(brood);
-                        for (int j = 0; j < population.size(); j++) {
-                            if (j != i && j != positionOfFemaleBird)
-                                newPopulation.add(population.get(j));
-                        }
-                    }
-                }
-            }
+
+            List<Bird> monoMales = population.stream().filter(b -> (b.getBirdGender().equals(BirdGender.MALE) && b.getBirdType().equals(BirdType.MONOGAMOUS))).collect(Collectors.toList());
+            List<Bird> polyMales = population.stream().filter(b -> (b.getBirdGender().equals(BirdGender.MALE) && b.getBirdType().equals(BirdType.POLYGYNOUS))).collect(Collectors.toList());
+            List<Bird> monoFemales = population.stream().filter(b -> (b.getBirdGender().equals(BirdGender.FEMALE) && b.getBirdType().equals(BirdType.MONOGAMOUS))).collect(Collectors.toList());
+            List<Bird> polyFemales = population.stream().filter(b -> (b.getBirdGender().equals(BirdGender.FEMALE) && b.getBirdType().equals(BirdType.POLYGYNOUS))).collect(Collectors.toList());
+
+            List<Bird> newFromMono = giveBirthToMatchedBroods(monoMales, monoFemales, opportunity, 1);
+            List<Bird> newFromPoly = giveBirthToMatchedBroods(polyMales, polyFemales, opportunity, FEMALE_MATES);
+            newPopulation.addAll(newFromMono);
+            newPopulation.addAll(newFromPoly);
+
             population = newPopulation;
             Collections.sort(population, new BirdComparator());
             largestMatchingScore = population.get(0).getMatchingScore();
@@ -117,15 +59,40 @@ public class BirdMatingOptimizerService {
         return population.get(0);
     }
 
-    private int randomUnmatedMaleBird(List<Bird> population) {
-        int pos = randomNumber(0, population.size() - 1);
-        Bird bird = population.get(pos);
-        if(population.stream().anyMatch(b-> (!b.isMated()) && BirdGender.MALE.equals(b.getBirdGender()))) {
-            while (BirdGender.MALE.equals(bird.getBirdGender()) && !bird.isMated()) {
-                pos = randomNumber(0, population.size() - 1);
+    private List<Bird> giveBirthToMatchedBroods(List<Bird> males, List<Bird> females, OpportunityDTO opportunity, int combiningSize) {
+        List<Bird> newPopulation = new ArrayList<>();
+        for(Bird male : males) {
+            List<Integer> femalePositions = randomFemaleBirdsFromPopulationWithLessThanNrOfMates(females, RANDOM_FEMALES_TO_MATE, combiningSize);
+            if (femalePositions.isEmpty()) {
+                return newPopulation;
             }
-            return pos;
-        }else return -1;
+            Bird maxMatchingScoreFemale = getMaxMatchingScore(females);
+            maxMatchingScoreFemale.increaseNrOfMates();
+            male.setMated(true);
+            Bird brood = new Bird();
+            brood.setMated(false);
+            brood.addGenes(union(male.getGenes(), maxMatchingScoreFemale.getGenes()));
+            //compute new matching after mating
+            List<Skill> broodAllSkills = new ArrayList<>();
+            for (ElderDTO elderDTO : brood.getGenes()) {
+                broodAllSkills.addAll(elderDTO.getElder().getSkills());
+            }
+            double match = semanticMatchingAlgorithm.match(opportunity, broodAllSkills);
+            brood.setMatchingScore(match);
+            newPopulation.add(brood);
+            if(match >= THRESHOLD){
+                return newPopulation;
+            }
+        }
+        List<Bird> unmatedMales = males.stream().filter(b -> !b.isMated()).collect(Collectors.toList());
+        List<Bird> unmatedFemales = females.stream().filter(b -> !b.isMated()).collect(Collectors.toList());
+        if(!unmatedFemales.isEmpty()){
+            newPopulation.addAll(unmatedFemales);
+        }
+        if(!unmatedMales.isEmpty()){
+            newPopulation.addAll(unmatedMales);
+        }
+        return newPopulation;
     }
 
     private boolean areThereAnyUnmatedBrids(List<Bird> birds){
@@ -146,7 +113,7 @@ public class BirdMatingOptimizerService {
             }
             //polygynyous
             else{
-                if(i <= (population.size() * 0.5) + (population.size() * 0.5) * MALE__POLYGYNY_BIRDS_PERCENTAGE){
+                if(i <= (population.size() * 0.5) + (population.size() * 0.5) * MALE_POLYGYNY_BIRDS_PERCENTAGE){
                     population.get(i).setBirdGender(BirdGender.MALE);
                 }else{
                     population.get(i).setBirdGender(BirdGender.FEMALE);
@@ -156,32 +123,20 @@ public class BirdMatingOptimizerService {
         }
     }
 
-    private List<Integer> randomUnmatedFemaleBirdsFromPopulation(List<Bird> birds, int nrOfRandomBirds){
-        Random rng = new Random();
-        List<Integer> generated = new ArrayList<>();
-        while (generated.size() < nrOfRandomBirds) {
-            Integer next = rng.nextInt(birds.size());
-            if(birds.get(next).getBirdGender().equals(BirdGender.FEMALE) && !birds.get(next).isMated()) {
-                generated.add(next);
-            }
-        }
-        return generated;
-    }
-
     private List<Integer> randomFemaleBirdsFromPopulationWithLessThanNrOfMates(List<Bird> birds, int nrOfRandomBirds, int nrOfMates){
         Random rng = new Random();
         List<Integer> generated = new ArrayList<>();
         while (generated.size() < nrOfRandomBirds) {
             Integer next = rng.nextInt(birds.size());
-            if(birds.get(next).getBirdGender().equals(BirdGender.FEMALE) && birds.get(next).getNrOfMates() < nrOfMates) {
+            if(birds.get(next).getNrOfMates() < nrOfMates) {
                 generated.add(next);
             }
         }
         return generated;
     }
 
-    private Bird getMaxMatchingScore(Map<Integer, Bird> birds){
-        return Collections.max(birds.values(), Comparator.comparing(Bird::getMatchingScore));
+    private Bird getMaxMatchingScore(List<Bird> birds){
+        return Collections.max(birds, Comparator.comparing(Bird::getMatchingScore));
     }
 
     private List<Bird> initializePopulation(List<ElderDTO> elders){
@@ -204,14 +159,5 @@ public class BirdMatingOptimizerService {
         al.clear();
         al.addAll(set);
         return al;
-    }
-
-    private int randomNumber(int min, int max) {
-
-        Random random = new Random();
-
-        return random.nextInt(max - min + 1) + min;
-
-
     }
 }

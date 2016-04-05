@@ -66,7 +66,7 @@ public class EldersSkillMatchApplication {
 //            }
 //            Company company = dataGenerator.generateCompany();
 //            dataGenerator.generateOpportunity(5, 8, 7, 10);
-           matchingService.applyMatchingAlgorithm(20);
+           matchingService.applyMatchingAlgorithm(10);
 //            int treeDepth1 = semanticMatchingAlgorithm.findTreeDepth(repository.findByName("domain_specific_skills_and_competences"));
 //            int treeDepth2 = semanticMatchingAlgorithm.findTreeDepth(repository.findByName("non_domain_specific_skills_and_competences"));
 //
