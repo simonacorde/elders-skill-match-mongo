@@ -72,6 +72,8 @@ public class EldersSkillMatchApplication {
 //
 //            log.info("Tree depth 1: "+ treeDepth1);
 //            log.info("Tree depth 2: "+ treeDepth2);
+
+//            matchingService.applyMatchingPlusBinPacking();
         };
     }
 }

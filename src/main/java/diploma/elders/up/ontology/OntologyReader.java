@@ -23,7 +23,7 @@ public class OntologyReader {
     public OWLOntology connectToOntology(){
         OWLOntologyManager manager= OWLManager.createOWLOntologyManager();
         IRI iri = IRI.create("http://www.co-ode.org/ontologies/skills/skills.owl");
-        File file = new File("D:\\Faculta\\Licenta\\projects\\elders-skill-match\\src\\main\\resources\\ontology\\skills.owl");
+        File file = new File("D:\\Licenta\\Program Licenta\\skills.owl");
         // Load the local copy
         OWLOntology localSkills = null;
         try {

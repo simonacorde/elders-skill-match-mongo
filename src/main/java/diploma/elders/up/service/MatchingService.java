@@ -1,5 +1,7 @@
 package diploma.elders.up.service;
 
+import diploma.elders.up.bin.packing.BinPackingOptimizerService;
+import diploma.elders.up.bin.packing.domain.Bin;
 import diploma.elders.up.bird.optimizer.BirdMatingOptimizerService;
 import diploma.elders.up.bird.optimizer.NoSuchBirdException;
 import diploma.elders.up.bird.optimizer.domain.Bird;
@@ -33,6 +35,8 @@ public class MatchingService {
     private SkillMatchingAlgorithm skillMatchingAlgorithm;
     @Autowired
     private SeniorRepository elderRepository;
+    @Autowired
+    private BinPackingOptimizerService binPackingOptimizerService;
     @Autowired
     private BirdMatingOptimizerService birdMatingOptimizerService;
     @Autowired
@@ -79,5 +83,19 @@ public class MatchingService {
             generated.add(seniors.get(next));
         }
         return generated;
+    }
+
+    public void applyMatchingPlusBinPacking() {
+        Opportunity opportunity = opportunityRepository.findAll().get(0);
+        OpportunityDTO opportunityDTO = new OpportunityDTO(opportunity);
+        Bin bin = null;
+        try {
+            bin = binPackingOptimizerService.applyBinPackingOptimizer(computeEldersMatchingWithOpportunity(opportunityDTO, 10), opportunityDTO);
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        LOGGER.info("Found for opportunity: " + opportunity.getId() + " the solution containing elders: " + bin.getResult().toString() + " with matching score: " + bin.getValue());
     }
 }
