@@ -90,7 +90,7 @@ public class MatchingService {
         OpportunityDTO opportunityDTO = new OpportunityDTO(opportunity);
         Bin bin = null;
         try {
-            bin = binPackingOptimizerService.applyBinPackingOptimizer(computeEldersMatchingWithOpportunity(opportunityDTO, 10), opportunityDTO);
+            bin = binPackingOptimizerService.applyBinPackingOptimizer(computeEldersMatchingWithOpportunity(opportunityDTO, 100), opportunityDTO);
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
