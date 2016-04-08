@@ -27,7 +27,7 @@ public class BirdMatingOptimizerService {
     @Autowired
     private SemanticMatchingAlgorithm semanticMatchingAlgorithm;
 
-    private static final double THRESHOLD = 0.80;
+    private static final double THRESHOLD = 0.78;
     private static final int FEMALE_MATES = 3;
     private static final double MONOGAMOUS_BIRDS_PERCENTAGE = 0.5;
     private static final double MALE_POLYGYNY_BIRDS_PERCENTAGE = 0.3;
@@ -59,19 +59,24 @@ public class BirdMatingOptimizerService {
         return population.get(0);
     }
 
-    private List<Bird> giveBirthToMatchedBroods(List<Bird> males, List<Bird> females, OpportunityDTO opportunity, int combiningSize) {
+    private List<Bird> giveBirthToMatchedBroods(List<Bird> males, List<Bird> females, OpportunityDTO opportunity, int mateSize) {
         List<Bird> newPopulation = new ArrayList<>();
         for(Bird male : males) {
-            List<Integer> femalePositions = randomFemaleBirdsFromPopulationWithLessThanNrOfMates(females, RANDOM_FEMALES_TO_MATE, combiningSize);
+            List<Integer> femalePositions = randomFemaleBirdsFromPopulationWithLessThanNrOfMates(females, RANDOM_FEMALES_TO_MATE, mateSize);
             if (femalePositions.isEmpty()) {
                 return newPopulation;
             }
-            Bird maxMatchingScoreFemale = getMaxMatchingScore(females);
-            maxMatchingScoreFemale.increaseNrOfMates();
+            List<Bird> maxMatchingScoreFemales = new ArrayList<>();
+            maxMatchingScoreFemales.addAll(getFirstMaxMatchingScores(females, mateSize));
+            for(Bird bird : maxMatchingScoreFemales){
+                bird.increaseNrOfMates();
+            }
             male.setMated(true);
             Bird brood = new Bird();
             brood.setMated(false);
-            brood.addGenes(union(male.getGenes(), maxMatchingScoreFemale.getGenes()));
+            List<ElderDTO> collect = maxMatchingScoreFemales.stream().map(Bird::getGenes).flatMap(List::stream).collect(Collectors.toList());
+            //set union of parent genes to the brood
+            brood.addGenes(union(male.getGenes(), collect));
             //compute new matching after mating
             List<Skill> broodAllSkills = new ArrayList<>();
             for (ElderDTO elderDTO : brood.getGenes()) {
@@ -93,6 +98,11 @@ public class BirdMatingOptimizerService {
             newPopulation.addAll(unmatedMales);
         }
         return newPopulation;
+    }
+
+    private List<Bird> getFirstMaxMatchingScores(List<Bird> females, int femaleMates) {
+        Collections.sort(females, new BirdComparator());
+        return females.subList(0, femaleMates);
     }
 
     private boolean areThereAnyUnmatedBrids(List<Bird> birds){

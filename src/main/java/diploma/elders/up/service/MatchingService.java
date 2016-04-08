@@ -11,6 +11,7 @@ import diploma.elders.up.dao.repository.OpportunityRepository;
 import diploma.elders.up.dao.repository.SeniorRepository;
 import diploma.elders.up.dto.ElderDTO;
 import diploma.elders.up.dto.OpportunityDTO;
+import diploma.elders.up.matching.ParallelSemanticMatching;
 import diploma.elders.up.matching.SemanticMatchingAlgorithm;
 import diploma.elders.up.matching.SkillMatchingAlgorithm;
 import org.slf4j.Logger;
@@ -43,6 +44,8 @@ public class MatchingService {
     private OpportunityRepository opportunityRepository;
     @Autowired
     private SemanticMatchingAlgorithm semanticMatchingAlgorithm;
+    @Autowired
+    private ParallelSemanticMatching parallelSemanticMatching;
 
     private List<Senior> getElderCVs(int size){
         Iterator<Senior> all = elderRepository.findAll().iterator();
@@ -60,7 +63,7 @@ public class MatchingService {
             ElderDTO elderDTO = new ElderDTO(elder);
             eldersMatched.add(elderDTO);
         }
-        return semanticMatchingAlgorithm.findMatchingCandidates(opportunity, eldersMatched, size);
+        return parallelSemanticMatching.findMatchingCandidates(opportunity, eldersMatched, size);
     }
 
     public void applyMatchingAlgorithm(int size) throws NoSuchBirdException, ExecutionException, InterruptedException {
