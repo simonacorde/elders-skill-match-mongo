@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class Bin {
 
-
+    public static final double capacity=1;
     private double value;
     private List<Tuple> result;
 
@@ -21,6 +21,8 @@ public class Bin {
         this.value = value;
         this.result = result;
     }
+
+
 
     public double getValue() {
         return value;
