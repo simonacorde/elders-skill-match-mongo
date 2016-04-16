@@ -10,6 +10,7 @@ import java.util.List;
 public class OpportunityDTO {
     private double matchingPercentage;
     private List<ElderDTO> candidates;
+    private List<SkillDTO> skills;
     private Opportunity opportunity;
 
     public OpportunityDTO(Opportunity opportunity) {
@@ -34,6 +35,14 @@ public class OpportunityDTO {
 
     public Opportunity getOpportunity() {
         return opportunity;
+    }
+
+    public List<SkillDTO> getSkills() {
+        return skills;
+    }
+
+    public void setSkills(List<SkillDTO> skills) {
+        this.skills = skills;
     }
 
     @Override

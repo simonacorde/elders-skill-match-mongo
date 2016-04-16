@@ -10,9 +10,19 @@ public class SkillDTO {
     private SkillDTO matchingSkill;
     private double matchingScore;
     private Skill skill;
+    private boolean matched = false;
+    private int opportunityPosition = -1;
+
+    public SkillDTO() {
+    }
 
     public SkillDTO(Skill skill) {
         this.skill = skill;
+    }
+
+    public SkillDTO(Skill skill, double matchingScore) {
+        this.skill = skill;
+        this.matchingScore = matchingScore;
     }
 
     public SkillDTO getMatchingSkill() {
@@ -21,6 +31,14 @@ public class SkillDTO {
 
     public void setMatchingSkill(SkillDTO matchingSkill) {
         this.matchingSkill = matchingSkill;
+    }
+
+    public int getOpportunityPosition() {
+        return opportunityPosition;
+    }
+
+    public void setOpportunityPosition(int opportunityPosition) {
+        this.opportunityPosition = opportunityPosition;
     }
 
     public double getMatchingScore() {
@@ -39,12 +57,22 @@ public class SkillDTO {
         this.skill = skill;
     }
 
+    public boolean isMatched() {
+        return matched;
+    }
+
+    public void setMatched(boolean matched) {
+        this.matched = matched;
+    }
+
     @Override
     public String toString() {
         return "SkillDTO{" +
                 "matchingSkill=" + matchingSkill +
                 ", matchingScore=" + matchingScore +
                 ", skill=" + skill +
+                ", matched=" + matched +
+                ", opportunityPosition=" + opportunityPosition +
                 '}';
     }
 }

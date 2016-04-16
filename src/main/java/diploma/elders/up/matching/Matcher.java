@@ -32,47 +32,109 @@ public class Matcher implements Callable {
         this.ontologyOperations = ontologyOperations;
     }
 
+//    @Override
+//    public ElderDTO call() {
+//        LOGGER.info("Matching nr of skills: " + elder.getElder().getSkills().size());
+//        List<SkillDTO> oppSkills = new ArrayList<>();
+//        List<SkillDTO> elderSkills = new ArrayList<>();
+//        for (Skill skillOpportunity : opp.getOpportunity().getSkills()) {
+//            oppSkills.add(new SkillDTO(skillOpportunity));
+//        }
+//        for (Skill skill : elder.getElder().getSkills()) {
+//            elderSkills.add(new SkillDTO(skill));
+//        }
+//
+//        double scoreSum = 0;
+//        double count = 0;
+//        for (SkillDTO oppSkill : oppSkills) {
+//            double maxScore = 0;
+//            SkillDTO matchingSkill = null;
+//            for (SkillDTO elderSkill : elderSkills) {
+//                double matchingScore = matchSkills(oppSkill.getSkill(), elderSkill.getSkill());
+//                if (matchingScore > maxScore) {
+//                    maxScore = matchingScore;
+//                    matchingSkill = elderSkill;
+//                    elderSkill.addMatchingSkill(oppSkill);
+//                }
+//            }
+//            oppSkill.addMatchingSkill(matchingSkill);
+//            oppSkill.setMatchingScore(maxScore);
+//            count++;
+//            scoreSum += maxScore;
+//        }
+//        double match = scoreSum / count;
+//        LOGGER.info("Returned match: {}", match);
+//        elder.setMatchingPercentage(match);
+//        elder.setMatchingSkills(elderSkills);
+//        opp.setSkills(oppSkills);
+//        elder.setMatchingOffer(opp);
+//        return elder;
+//    }
+
     @Override
     public ElderDTO call() {
         LOGGER.info("Matching nr of skills: " + elder.getElder().getSkills().size());
         List<SkillDTO> oppSkills = new ArrayList<>();
         List<SkillDTO> elderSkills = new ArrayList<>();
+
         for (Skill skillOpportunity : opp.getOpportunity().getSkills()) {
-            oppSkills.add(new SkillDTO(skillOpportunity));
+            oppSkills.add(new SkillDTO(skillOpportunity, 0));
         }
         for (Skill skill : elder.getElder().getSkills()) {
-            elderSkills.add(new SkillDTO(skill));
+            elderSkills.add(new SkillDTO(skill, 0));
         }
 
-        double scoreSum = 0;
-        double count = 0;
-        double allSkills = 0;
-        double countSkills = 0;
-        for (SkillDTO oppSkill : oppSkills) {
-            double maxScore = 0;
-            double score = 0;
-            SkillDTO matchingSkill = null;
-            for (SkillDTO elderSkill : elderSkills) {
-                double matchingScore = matchSkills(oppSkill.getSkill(), elderSkill.getSkill());
-                if (matchingScore > maxScore) {
-                    maxScore = matchingScore;
-                    matchingSkill = elderSkill;
+        for (SkillDTO elderSkill : elderSkills) {
+            for (int i=0; i < oppSkills.size(); i++) {
+                double matchingScore = matchSkills(oppSkills.get(i).getSkill(), elderSkill.getSkill());
+                if (matchingScore > elderSkill.getMatchingScore() && matchingScore > oppSkills.get(i).getMatchingScore()) {
+                    oppSkills.get(i).setMatchingScore(matchingScore);
+                    elderSkill.setMatchingScore(matchingScore);
+                    elderSkill.setMatchingSkill(oppSkills.get(i));
+                    elderSkill.setOpportunityPosition(i);
                 }
-                allSkills += matchingScore;
-                countSkills++;
             }
-            score = allSkills/countSkills;
-            oppSkill.setMatchingSkill(matchingSkill);
-            oppSkill.setMatchingScore(score);
-            count++;
-            scoreSum += score;
         }
-        double match = scoreSum / count;
+        double match = elderSkills.stream().mapToDouble(SkillDTO::getMatchingScore).average().getAsDouble();
         LOGGER.info("Returned match: {}", match);
         elder.setMatchingPercentage(match);
+        elder.setMatchingSkills(elderSkills);
+        elder.setMatchingOffer(opp);
         return elder;
     }
 
+    public ElderDTO match() {
+        LOGGER.info("Matching nr of skills: " + elder.getElder().getSkills().size());
+        List<SkillDTO> oppSkills = new ArrayList<>();
+        List<SkillDTO> elderSkills = new ArrayList<>();
+
+        for (Skill skillOpportunity : opp.getOpportunity().getSkills()) {
+            oppSkills.add(new SkillDTO(skillOpportunity, 0));
+        }
+        for (Skill skill : elder.getElder().getSkills()) {
+            elderSkills.add(new SkillDTO(skill, 0));
+        }
+
+        for (SkillDTO elderSkill : elderSkills) {
+            for (int i=0; i < oppSkills.size(); i++) {
+                double matchingScore = matchSkills(oppSkills.get(i).getSkill(), elderSkill.getSkill());
+                if (matchingScore > elderSkill.getMatchingScore() && matchingScore > oppSkills.get(i).getMatchingScore()) {
+                    oppSkills.get(i).setMatchingScore(matchingScore);
+                    elderSkill.setMatchingScore(matchingScore);
+                    elderSkill.setMatchingSkill(oppSkills.get(i));
+                    elderSkill.setOpportunityPosition(i);
+                    elderSkill.setMatched(true);
+                    oppSkills.get(i).setMatched(true);
+                }
+            }
+        }
+        double match = elderSkills.stream().mapToDouble(SkillDTO::getMatchingScore).average().getAsDouble();
+        LOGGER.info("Returned match: {}", match);
+        elder.setMatchingPercentage(match);
+        elder.setMatchingSkills(elderSkills);
+        elder.setMatchingOffer(opp);
+        return elder;
+    }
 
     public double matchSkills(Skill skill1, Skill skill2){
         int distance = ontologyOperations.getDistance(skill1.getName(), skill2.getName());

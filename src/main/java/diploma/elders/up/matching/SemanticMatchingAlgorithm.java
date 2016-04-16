@@ -36,7 +36,7 @@ public class SemanticMatchingAlgorithm {
     public List<ElderDTO> findMatchingCandidates(OpportunityDTO op, List<ElderDTO> candidates, int size) {
         List<ElderDTO> matchingElders = new ArrayList<>();
         for (ElderDTO elder : candidates) {
-            double matchScore = match(op, elder.getElder().getSkills());
+            double matchScore = match(op, elder);
             LOGGER.info("Match score between opportunity: "+ op.getOpportunity().getId() + " and elder: "+ elder.getElder().getId());
             elder.setMatchingPercentage(matchScore);
             matchingElders.add(elder);
@@ -59,8 +59,9 @@ public class SemanticMatchingAlgorithm {
         return 1.0 - (distance / MAX_DISTANCE);
     }
 
-    public double match(OpportunityDTO opp, List<Skill> skills) {
-        LOGGER.info("Matching nr of skills: "+ skills.size());
+    public double match(OpportunityDTO opp, ElderDTO elderDTO) {
+        List<Skill> skills = elderDTO.getElder().getSkills();
+        LOGGER.info("Matching nr of skills: " + skills.size());
         List<SkillDTO> oppSkills = new ArrayList<>();
         List<SkillDTO> elderSkills = new ArrayList<>();
         for(Skill skillOpportunity: opp.getOpportunity().getSkills()){
@@ -80,6 +81,7 @@ public class SemanticMatchingAlgorithm {
                 if (matchingScore > maxScore) {
                     maxScore = matchingScore;
                     matchingSkill = elderSkill;
+                    elderSkill.setMatchingScore(matchingScore);
                 }
             }
             oppSkill.setMatchingSkill(matchingSkill);
@@ -87,6 +89,8 @@ public class SemanticMatchingAlgorithm {
             count++;
             scoreSum += maxScore;
         }
+        elderDTO.setMatchingSkills(elderSkills);
+        opp.setSkills(oppSkills);
         double v = scoreSum / count;
         LOGGER.info("Returned match: {}", v);
         return v;

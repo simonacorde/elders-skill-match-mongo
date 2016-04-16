@@ -72,7 +72,7 @@ public class MatchingService {
         Bird bird = birdMatingOptimizerService.applyBirdMatingOptimizer(computeEldersMatchingWithOpportunity(opportunityDTO, size), opportunityDTO);
         LOGGER.info("Found for opportunity: " + opportunity.getId() + " the solution containing skills: " + bird.getGenes() + " with matching score: " + bird.getMatchingScore());
         int skills = 0;
-        for(ElderDTO elderDTO : bird.getGenes()){
+        for(ElderDTO elderDTO : bird.getElders()){
             skills += elderDTO.getElder().getSkills().size();
         }
         LOGGER.info("Matching score : {} with a number of {} elders and with a total number of skills : {}!", bird.getMatchingScore(), bird.getGenes().size(),skills);

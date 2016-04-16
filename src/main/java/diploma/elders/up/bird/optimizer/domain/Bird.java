@@ -14,11 +14,13 @@ public class Bird {
     private BirdType birdType;
     private double matchingScore;
     private boolean mated;
-    private List<ElderDTO> genes;
+    private List<ElderDTO> elders;
     private int nrOfMates = 0;
+    private List<Double> genes;
 
     public Bird() {
         genes = new ArrayList<>();
+        elders = new ArrayList<>();
     }
 
     public BirdGender getBirdGender() {
@@ -45,16 +47,28 @@ public class Bird {
         this.matchingScore = matchingScore;
     }
 
-    public List<ElderDTO> getGenes() {
+    public List<ElderDTO> getElders() {
+        return elders;
+    }
+
+    public void addElder(ElderDTO elder) {
+        elders.add(elder);
+    }
+
+    public void setElders(List<ElderDTO> elders) {
+        this.elders = elders;
+    }
+
+    public List<Double> getGenes() {
         return genes;
     }
 
-    public void addGene(ElderDTO elderDTO){
-        genes.add(elderDTO);
+    public void setGenes(List<Double> genes) {
+        this.genes = genes;
     }
 
-    public void addGenes(List<ElderDTO> elderDTO){
-        genes.addAll(elderDTO);
+    public void addGene(Double gene) {
+        genes.add(gene);
     }
 
     public boolean isMated() {

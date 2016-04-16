@@ -12,7 +12,8 @@ public class ElderDTO {
 
     private Senior elder;
     private double matchingPercentage;
-    private List<OpportunityDTO> matchingOffers;
+    private OpportunityDTO matchingOffer;
+    private List<SkillDTO> matchingSkills;
 
     public ElderDTO(Senior elder) {
         this.elder = elder;
@@ -26,16 +27,24 @@ public class ElderDTO {
         this.matchingPercentage = matchingPercentage;
     }
 
-    public List<OpportunityDTO> getMatchingOffers() {
-        return matchingOffers;
+    public OpportunityDTO getMatchingOffer() {
+        return matchingOffer;
     }
 
-    public void setMatchingOffers(List<OpportunityDTO> matchingOffers) {
-        this.matchingOffers = matchingOffers;
+    public void setMatchingOffer(OpportunityDTO matchingOffer) {
+        this.matchingOffer = matchingOffer;
     }
 
     public Senior getElder() {
         return elder;
+    }
+
+    public List<SkillDTO> getMatchingSkills() {
+        return matchingSkills;
+    }
+
+    public void setMatchingSkills(List<SkillDTO> matchingSkills) {
+        this.matchingSkills = matchingSkills;
     }
 
     @Override
@@ -43,7 +52,7 @@ public class ElderDTO {
         return "ElderDTO{" +
                 "elder=" + elder +
                 ", matchingPercentage=" + matchingPercentage +
-                ", matchingOffers=" + matchingOffers +
+                ", matchingOffer=" + matchingOffer +
                 '}';
     }
 }
