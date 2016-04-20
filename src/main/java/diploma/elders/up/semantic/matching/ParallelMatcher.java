@@ -1,10 +1,8 @@
-package diploma.elders.up.matching;
+package diploma.elders.up.semantic.matching;
 
-import diploma.elders.up.dao.repository.SkillRepository;
 import diploma.elders.up.dto.ElderComparator;
 import diploma.elders.up.dto.ElderDTO;
 import diploma.elders.up.dto.OpportunityDTO;
-import diploma.elders.up.ontology.OntologyLikeOperations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +20,12 @@ import java.util.concurrent.ThreadPoolExecutor;
  * Created by Simonas on 4/8/2016.
  */
 @Component
-public class ParallelSemanticMatching {
+public class ParallelMatcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SemanticMatchingAlgorithm.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParallelMatcher.class);
 
     @Autowired
-    private SkillRepository skillRepository;
-    @Autowired
-    private OntologyLikeOperations ontologyOperations;
+    private OntologySemanticMatcher ontologySemanticMatcher;
 
     public List<ElderDTO> findMatchingCandidates(OpportunityDTO op, List<ElderDTO> candidates, int size) {
         List<ElderDTO> matchingElders = new ArrayList<>();
@@ -37,7 +33,7 @@ public class ParallelSemanticMatching {
         List<Future> resultList = new ArrayList<>();
 
         for (ElderDTO elder : candidates) {
-            Matcher matcher = new Matcher(ontologyOperations, op, elder);
+            Matcher matcher = new Matcher(ontologySemanticMatcher, op, elder);
             Future result = executor.submit(matcher);
             resultList.add(result);
         }

@@ -11,9 +11,7 @@ import diploma.elders.up.dao.repository.OpportunityRepository;
 import diploma.elders.up.dao.repository.SeniorRepository;
 import diploma.elders.up.dto.ElderDTO;
 import diploma.elders.up.dto.OpportunityDTO;
-import diploma.elders.up.matching.ParallelSemanticMatching;
-import diploma.elders.up.matching.SemanticMatchingAlgorithm;
-import diploma.elders.up.matching.SkillMatchingAlgorithm;
+import diploma.elders.up.semantic.matching.ParallelMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +31,6 @@ public class MatchingService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MatchingService.class);
 
     @Autowired
-    private SkillMatchingAlgorithm skillMatchingAlgorithm;
-    @Autowired
     private SeniorRepository elderRepository;
     @Autowired
     private BinPackingOptimizerService binPackingOptimizerService;
@@ -43,9 +39,7 @@ public class MatchingService {
     @Autowired
     private OpportunityRepository opportunityRepository;
     @Autowired
-    private SemanticMatchingAlgorithm semanticMatchingAlgorithm;
-    @Autowired
-    private ParallelSemanticMatching parallelSemanticMatching;
+    private ParallelMatcher parallelMatcher;
 
     private List<Senior> getElderCVs(int size){
         Iterator<Senior> all = elderRepository.findAll().iterator();
@@ -63,7 +57,7 @@ public class MatchingService {
             ElderDTO elderDTO = new ElderDTO(elder);
             eldersMatched.add(elderDTO);
         }
-        return parallelSemanticMatching.findMatchingCandidates(opportunity, eldersMatched, size);
+        return parallelMatcher.findMatchingCandidates(opportunity, eldersMatched, size);
     }
 
     public void applyMatchingAlgorithm(int size) throws NoSuchBirdException, ExecutionException, InterruptedException {

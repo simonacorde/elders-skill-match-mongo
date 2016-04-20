@@ -3,7 +3,6 @@ package diploma.elders.up;
 import diploma.elders.up.dao.repository.SeniorRepository;
 import diploma.elders.up.dao.repository.SkillRepository;
 import diploma.elders.up.data.DataGenerator;
-import diploma.elders.up.matching.SemanticMatchingAlgorithm;
 import diploma.elders.up.ontology.OntologyReader;
 import diploma.elders.up.service.MatchingService;
 import org.slf4j.Logger;
@@ -36,8 +35,6 @@ public class EldersSkillMatchApplication {
     private SeniorRepository seniorRepository;
     @Autowired
     private MatchingService matchingService;
-    @Autowired
-    private SemanticMatchingAlgorithm semanticMatchingAlgorithm;
 
     @Bean
     public CommandLineRunner demo() {
@@ -65,8 +62,8 @@ public class EldersSkillMatchApplication {
 //                log.info("Elder: ", senior.getId());
 //            }
 //            Company company = dataGenerator.generateCompany();
-//            dataGenerator.generateOpportunity(5, 8, 7, 10);
-           matchingService.applyMatchingAlgorithm(10);
+//            dataGenerator.generateOpportunity(4, 6, 6, 8);
+            matchingService.applyMatchingAlgorithm(10);
 //            int treeDepth1 = semanticMatchingAlgorithm.findTreeDepth(repository.findByName("domain_specific_skills_and_competences"));
 //            int treeDepth2 = semanticMatchingAlgorithm.findTreeDepth(repository.findByName("non_domain_specific_skills_and_competences"));
 //

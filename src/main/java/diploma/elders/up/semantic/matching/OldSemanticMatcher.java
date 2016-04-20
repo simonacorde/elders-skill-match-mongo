@@ -1,4 +1,4 @@
-package diploma.elders.up.matching;
+package diploma.elders.up.semantic.matching;
 
 /**
  * Created by Simonas on 2/29/2016.
@@ -10,16 +10,14 @@ import diploma.elders.up.ontology.OntologyLikeOperations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Component
-public class SkillMatchingAlgorithm implements OntologyMatching{
+public class OldSemanticMatcher implements OntologySemanticMatcher {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SkillMatchingAlgorithm.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OldSemanticMatcher.class);
 
     @Autowired
     private OntologyLikeOperations ontologyOperations;

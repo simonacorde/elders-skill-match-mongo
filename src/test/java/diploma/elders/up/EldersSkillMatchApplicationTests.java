@@ -6,9 +6,6 @@ import diploma.elders.up.dao.documents.Skill;
 import diploma.elders.up.dao.repository.OpportunityRepository;
 import diploma.elders.up.dao.repository.SeniorRepository;
 import diploma.elders.up.dao.repository.SkillRepository;
-import diploma.elders.up.matching.SemanticMatchingAlgorithm;
-import diploma.elders.up.matching.SkillMatchingAlgorithm;
-import diploma.elders.up.ontology.OntologyLikeOperations;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,13 +19,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 public class EldersSkillMatchApplicationTests {
 
 	@Autowired
-	private SemanticMatchingAlgorithm semanticMatchingAlgorithm;
-	@Autowired
-	private SkillMatchingAlgorithm skillMatchingAlgorithm;
-	@Autowired
 	private SkillRepository skillRepository;
-	@Autowired
-	private OntologyLikeOperations ontologyLikeOperations;
 	@Autowired
 	private SeniorRepository seniorRepository;
 	@Autowired
@@ -42,7 +33,7 @@ public class EldersSkillMatchApplicationTests {
 		Senior one = seniorRepository.findOne("56f8328eecdb7333903c1e3c");
 //		double match = semanticMatchingAlgorithm.match(new OpportunityDTO(opportunity), one.getSkills());
 		//double m1 = semanticMatchingAlgorithm.matchSkills(fSkill, sSkill);
-		///double m2 = skillMatchingAlgorithm.matchSkills(fSkill, sSkill);
+		///double m2 = oldSemanticMatcher.matchSkills(fSkill, sSkill);
 
 //		double error =  match;
 

@@ -26,12 +26,11 @@ public class BirdMatingOptimizerService {
     private static final int FEMALE_MATES = 3;
     private static final double MONOGAMOUS_BIRDS_PERCENTAGE = 0.5;
     private static final double MALE_POLYGYNY_BIRDS_PERCENTAGE = 0.3;
-    private static final int RANDOM_FEMALES_TO_MATE = 10;
 
     public Bird applyBirdMatingOptimizer(List<ElderDTO> elders, OpportunityDTO opportunity) throws NoSuchBirdException {
         double largestMatchingScore = elders.get(0).getMatchingPercentage(); // largest score in elders
         long bestMatchNrOSkills;
-        List<Bird> population = initializePopulation(elders, opportunity.getOpportunity().getSkills().size());
+        List<Bird> population = initializePopulation(elders);
 
         while(largestMatchingScore <= THRESHOLD && areThereAnyUnmatedBrids(population) && population.size() > 2) {
             classifyPopulation(population);
@@ -99,6 +98,7 @@ public class BirdMatingOptimizerService {
         }
         List<Bird> unmatedMales = males.stream().filter(b -> !b.isMated()).collect(Collectors.toList());
         List<Bird> unmatedFemales = females.stream().filter(b -> !b.isMated()).collect(Collectors.toList());
+
         if(!unmatedFemales.isEmpty()){
             newPopulation.addAll(unmatedFemales);
         }
@@ -119,11 +119,6 @@ public class BirdMatingOptimizerService {
             broodDNA[i] = max.getAsDouble();
         }
         return Arrays.asList(broodDNA);
-    }
-
-    private List<Bird> getFirstMaxMatchingScores(List<Bird> females, int femaleMates) {
-        Collections.sort(females, new BirdComparator());
-        return females.subList(0, femaleMates);
     }
 
     private boolean areThereAnyUnmatedBrids(List<Bird> birds){
@@ -154,12 +149,8 @@ public class BirdMatingOptimizerService {
         }
     }
 
-    private List<Bird> initializePopulation(List<ElderDTO> elders, int opportunitySize){
+    private List<Bird> initializePopulation(List<ElderDTO> elders){
         List<Bird> population = new ArrayList<>();
-        Double[] genes = new Double[opportunitySize];
-        for(int i=0;i<genes.length;i++){
-            genes[i] = 0.0;
-        }
 
         for(ElderDTO elderDTO : elders){
             Bird bird = new Bird();

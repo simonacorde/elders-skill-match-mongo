@@ -5,10 +5,8 @@ import diploma.elders.up.bin.packing.domain.Tuple;
 import diploma.elders.up.bin.packing.domain.TupleComparator;
 import diploma.elders.up.dto.ElderDTO;
 import diploma.elders.up.dto.OpportunityDTO;
-import diploma.elders.up.matching.SkillMatchingAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -24,10 +22,6 @@ public class BinPackingOptimizerService {
     private static final Logger LOGGER = LoggerFactory.getLogger(BinPackingOptimizerService.class);
     private List<Tuple> tuples=new ArrayList<>();
     private static final double binCapacity = 1;
-
-
-    @Autowired
-    private SkillMatchingAlgorithm skillMatchingAlgorithm;
 
     public Bin applyBinPackingOptimizer(List<ElderDTO> elders, OpportunityDTO opportunity)
     {
