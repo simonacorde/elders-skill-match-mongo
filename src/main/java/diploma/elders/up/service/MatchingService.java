@@ -75,7 +75,7 @@ public class MatchingService {
         for(ElderDTO elderDTO : bird.getElders()){
             skills += elderDTO.getElder().getSkills().size();
         }
-        LOGGER.info("Matching score : {} with a number of {} elders and with a total number of skills : {}!", bird.getMatchingScore(), bird.getGenes().size(),skills);
+        LOGGER.info("Matching score : {} with a number of {} elders and with a total number of skills : {}!", bird.getMatchingScore(), bird.getElders().size(),skills);
     }
 
     private List<Senior> randomList(List<Senior> seniors, int size){

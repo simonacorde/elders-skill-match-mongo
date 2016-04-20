@@ -71,8 +71,35 @@ public class SkillDTO {
                 "matchingSkill=" + matchingSkill +
                 ", matchingScore=" + matchingScore +
                 ", skill=" + skill +
-                ", matched=" + matched +
-                ", opportunityPosition=" + opportunityPosition +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SkillDTO skillDTO = (SkillDTO) o;
+
+        if (Double.compare(skillDTO.matchingScore, matchingScore) != 0) return false;
+        if (matched != skillDTO.matched) return false;
+        if (opportunityPosition != skillDTO.opportunityPosition) return false;
+        if (matchingSkill != null ? !matchingSkill.equals(skillDTO.matchingSkill) : skillDTO.matchingSkill != null)
+            return false;
+        return !(skill != null ? !skill.equals(skillDTO.skill) : skillDTO.skill != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = matchingSkill != null ? matchingSkill.hashCode() : 0;
+        temp = Double.doubleToLongBits(matchingScore);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (skill != null ? skill.hashCode() : 0);
+        result = 31 * result + (matched ? 1 : 0);
+        result = 31 * result + opportunityPosition;
+        return result;
     }
 }

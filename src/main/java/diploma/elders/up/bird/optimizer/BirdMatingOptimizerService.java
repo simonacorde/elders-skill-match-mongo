@@ -30,10 +30,10 @@ public class BirdMatingOptimizerService {
 
     public Bird applyBirdMatingOptimizer(List<ElderDTO> elders, OpportunityDTO opportunity) throws NoSuchBirdException {
         double largestMatchingScore = elders.get(0).getMatchingPercentage(); // largest score in elders
-        long bestMatchNrOSkills = elders.get(0).getElder().getSkills().size();
+        long bestMatchNrOSkills;
         List<Bird> population = initializePopulation(elders, opportunity.getOpportunity().getSkills().size());
 
-        while(largestMatchingScore <= THRESHOLD && areThereAnyUnmatedBrids(population) && population.size() > 1){
+        while(largestMatchingScore <= THRESHOLD && areThereAnyUnmatedBrids(population) && population.size() > 2) {
             classifyPopulation(population);
             List<Bird> newPopulation = new ArrayList<>();
 
@@ -43,22 +43,24 @@ public class BirdMatingOptimizerService {
             List<Bird> polyFemales = population.stream().filter(b -> (b.getBirdGender().equals(BirdGender.FEMALE) && b.getBirdType().equals(BirdType.POLYGYNOUS))).collect(Collectors.toList());
 
             List<Bird> newFromMono = giveBirth(monoMales, monoFemales, 1);
-            List<Bird> newFromPoly = giveBirth(polyMales, polyFemales, FEMALE_MATES);
             newPopulation.addAll(newFromMono);
+            List<Bird> newFromPoly = giveBirth(polyMales, polyFemales, FEMALE_MATES);
             newPopulation.addAll(newFromPoly);
 
             population = newPopulation;
-            Collections.sort(population, new BirdComparator());
-            largestMatchingScore = population.get(0).getMatchingScore();
-            bestMatchNrOSkills = population.get(0).getGenes().stream().count();
-            LOGGER.info("Largest score so far: "+ largestMatchingScore+"  Population size: "+ population.size() + " with nr of skills: "+ bestMatchNrOSkills);
+            if (!population.isEmpty()) {
+                Collections.sort(population, new BirdComparator());
+                largestMatchingScore = population.get(0).getMatchingScore();
+                bestMatchNrOSkills = population.get(0).getGenes().stream().count();
+                LOGGER.info("Largest score so far: " + largestMatchingScore + "  Population size: " + population.size() + " with nr of skills: " + bestMatchNrOSkills);
+            }
         }
         return population.get(0);
     }
 
     private List<Bird> giveBirth(List<Bird> males, List<Bird> females, int mateSize){
         List<Bird> newPopulation = new ArrayList<>();
-
+        Bird bestBird = males.get(0);
         for(Bird male : males){
             if(!females.isEmpty()){
                 Collections.sort(females, new BirdComparator());
@@ -69,72 +71,30 @@ public class BirdMatingOptimizerService {
                     femalesToMate.add(iterator.next());
                 }
 
+                if(femalesToMate.isEmpty()){
+                    return Collections.singletonList(bestBird);
+                }
+
                 List<ElderDTO> collect = femalesToMate.stream().map(Bird::getElders).flatMap(List::stream).collect(Collectors.toList());
                 Bird brood = new Bird();
                 brood.setMated(false);
                 brood.setElders(union(male.getElders(), collect));
                 male.setMated(true);
+                male.increaseNrOfMates();
                 for(Bird femaleToMate: femalesToMate){
-                    femaleToMate.setMated(true);
-                    List<Double> broodDNA = naturalSelectionOfGenes(male, femalesToMate);
-                    double match = broodDNA.stream().mapToDouble(i->i).average().getAsDouble();
-                    brood.setMatchingScore(match);
-                    brood.setGenes(broodDNA);
-                    newPopulation.add(brood);
-                    if(match >= THRESHOLD){
-                        return newPopulation;
+                    femaleToMate.increaseNrOfMates();
+                    if(femaleToMate.getNrOfMates() >= size){
+                        femaleToMate.setMated(true);
                     }
                 }
-            }
-            List<Bird> unmatedMales = males.stream().filter(b -> !b.isMated()).collect(Collectors.toList());
-            List<Bird> unmatedFemales = females.stream().filter(b -> !b.isMated()).collect(Collectors.toList());
-            if(!unmatedFemales.isEmpty()){
-                newPopulation.addAll(unmatedFemales);
-            }
-            if(!unmatedMales.isEmpty()){
-                newPopulation.addAll(unmatedMales);
-            }
-            return newPopulation;
-        }
-
-        return newPopulation;
-    }
-
-    private List<Bird> giveBirthToMatchedBroods(List<Bird> males, List<Bird> females, int mateSize) {
-        List<Bird> newPopulation = new ArrayList<>();
-        for(Bird male : males) {
-            List<Integer> femalePositions = randomFemaleBirdsFromPopulationWithLessThanNrOfMates(females, RANDOM_FEMALES_TO_MATE, mateSize);
-            if (femalePositions.isEmpty()) {
-                return newPopulation;
-            }
-            List<Bird> maxMatchingScoreFemales = new ArrayList<>();
-            maxMatchingScoreFemales.addAll(getFirstMaxMatchingScores(females, mateSize));
-            for(Bird bird : maxMatchingScoreFemales){
-                bird.increaseNrOfMates();
-            }
-            male.setMated(true);
-            Bird brood = new Bird();
-            brood.setMated(false);
-            List<ElderDTO> collect = maxMatchingScoreFemales.stream().map(Bird::getElders).flatMap(List::stream).collect(Collectors.toList());
-//            //set union of parent genes to the brood
-//            brood.setElders(union(male.getElders(), collect));
-//            //compute new matching after mating
-//            List<Skill> broodAllSkills = new ArrayList<>();
-//            for (ElderDTO elderDTO : brood.getElders()) {
-//                broodAllSkills.addAll(elderDTO.getElder().getSkills());
-//            }
-//            double match = semanticMatchingAlgorithm.match(opportunity, broodAllSkills);
-//            //double match = rematchBroodSkills(broodAllSkills);
-
-            //other match
-            brood.setElders(union(male.getElders(), collect));
-            List<Double> broodDNA = naturalSelectionOfGenes(male, maxMatchingScoreFemales);
-            double match = broodDNA.stream().mapToDouble(i->i).average().getAsDouble();
-            brood.setMatchingScore(match);
-            brood.setGenes(broodDNA);
-            newPopulation.add(brood);
-            if(match >= THRESHOLD){
-                return newPopulation;
+                List<Double> broodDNA = naturalSelectionOfGenes(male, femalesToMate);
+                double match = broodDNA.stream().mapToDouble(i->i).average().getAsDouble();
+                brood.setMatchingScore(match);
+                brood.setGenes(broodDNA);
+                newPopulation.add(brood);
+                if(match >= THRESHOLD){
+                    return newPopulation;
+                }
             }
         }
         List<Bird> unmatedMales = males.stream().filter(b -> !b.isMated()).collect(Collectors.toList());
@@ -147,7 +107,6 @@ public class BirdMatingOptimizerService {
         }
         return newPopulation;
     }
-
     private List<Double> naturalSelectionOfGenes(Bird male, List<Bird> females) {
         Double[] broodDNA = new Double[male.getGenes().size()];
         for(int i=0; i < male.getGenes().size(); i++){
@@ -172,51 +131,27 @@ public class BirdMatingOptimizerService {
     }
 
     //first half monogamous, second half polygynyous. monogamous : 50/50 males/females, polygynyous:  30% males, 70% females
-    private void classifyPopulation(List<Bird> population){
-        for(int i=0; i < population.size(); i++) {
+    private void classifyPopulation(List<Bird> population) {
+        for (int i = 0; i < population.size(); i++) {
             //monogamous
-            if(i <= population.size() * MONOGAMOUS_BIRDS_PERCENTAGE - 1){
-                if(i % 2 == 0 ){
+            if (i <= population.size() * MONOGAMOUS_BIRDS_PERCENTAGE - 1) {
+                if (i % 2 == 0) {
                     population.get(i).setBirdGender(BirdGender.MALE);
-                }else{
+                } else {
                     population.get(i).setBirdGender(BirdGender.FEMALE);
                 }
                 population.get(i).setBirdType(BirdType.MONOGAMOUS);
             }
             //polygynyous
-            else{
-                if(i <= (population.size() * 0.5) + (population.size() * 0.5) * MALE_POLYGYNY_BIRDS_PERCENTAGE){
+            else {
+                if (i <= (population.size() * 0.5) + (population.size() * 0.5) * MALE_POLYGYNY_BIRDS_PERCENTAGE) {
                     population.get(i).setBirdGender(BirdGender.MALE);
-                }else{
+                } else {
                     population.get(i).setBirdGender(BirdGender.FEMALE);
                 }
                 population.get(i).setBirdType(BirdType.POLYGYNOUS);
             }
         }
-    }
-
-    private List<Integer> randomFemaleBirdsFromPopulationWithLessThanNrOfMates(List<Bird> birds, int nrOfRandomBirds, int nrOfMates){
-        Random rng = new Random();
-        List<Integer> generated = new ArrayList<>();
-        while (generated.size() < nrOfRandomBirds) {
-            Integer next = rng.nextInt(birds.size());
-            if(birds.get(next).getNrOfMates() < nrOfMates) {
-                generated.add(next);
-            }
-        }
-        return generated;
-    }
-
-    private double rematchBroodSkills(List<SkillDTO> broodSkills){
-        double matchScoreSum = 0;
-        for(SkillDTO skill: broodSkills){
-            matchScoreSum += skill.getMatchingScore();
-        }
-        return matchScoreSum / (double) broodSkills.size();
-    }
-
-    private Bird getMaxMatchingScore(List<Bird> birds){
-        return Collections.max(birds, Comparator.comparing(Bird::getMatchingScore));
     }
 
     private List<Bird> initializePopulation(List<ElderDTO> elders, int opportunitySize){
@@ -229,17 +164,10 @@ public class BirdMatingOptimizerService {
         for(ElderDTO elderDTO : elders){
             Bird bird = new Bird();
             bird.addElder(elderDTO);
-            for(int i=0; i < opportunitySize; i++){
-                for(SkillDTO skillDTO: elderDTO.getMatchingSkills()){
-                    if(skillDTO.getOpportunityPosition() == i){
-                        genes[i] = skillDTO.getMatchingScore();
-                    }
-                }
-            }
-            List<Double> genesList = Arrays.asList(genes);
-            bird.setGenes(genesList);
+            bird.setMatchingScore(elderDTO.getMatchingPercentage());
+            bird.setGenes(elderDTO.getMatchingSkills().stream().map(SkillDTO::getMatchingScore).collect(Collectors.toList()));
             bird.setMated(false);
-            bird.setMatchingScore(genesList.stream().mapToDouble(i->i).average().getAsDouble());
+
             population.add(bird);
         }
         return population;
