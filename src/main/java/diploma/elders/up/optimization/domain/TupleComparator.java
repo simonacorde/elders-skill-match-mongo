@@ -1,4 +1,4 @@
-package diploma.elders.up.bin.packing.domain;
+package diploma.elders.up.optimization.domain;
 
 import java.util.Comparator;
 

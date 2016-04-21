@@ -1,4 +1,4 @@
-package diploma.elders.up.bird.optimizer;
+package diploma.elders.up.optimization.bird.optimizer;
 
 /**
  * Created by Simonas on 4/3/2016.

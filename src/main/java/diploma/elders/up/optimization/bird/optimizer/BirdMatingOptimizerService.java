@@ -1,11 +1,8 @@
-package diploma.elders.up.bird.optimizer;
+package diploma.elders.up.optimization.bird.optimizer;
 
-import diploma.elders.up.bird.optimizer.domain.Bird;
-import diploma.elders.up.bird.optimizer.domain.BirdComparator;
-import diploma.elders.up.bird.optimizer.domain.BirdGender;
-import diploma.elders.up.bird.optimizer.domain.BirdType;
+import diploma.elders.up.optimization.OptimizerService;
+import diploma.elders.up.optimization.domain.*;
 import diploma.elders.up.dto.ElderDTO;
-import diploma.elders.up.dto.OpportunityDTO;
 import diploma.elders.up.dto.SkillDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +15,7 @@ import java.util.stream.Collectors;
  * Created by Simonas on 3/5/2016.
  */
 @Service
-public class BirdMatingOptimizerService {
+public class BirdMatingOptimizerService implements OptimizerService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BirdMatingOptimizerService.class);
 
@@ -27,7 +24,16 @@ public class BirdMatingOptimizerService {
     private static final double MONOGAMOUS_BIRDS_PERCENTAGE = 0.5;
     private static final double MALE_POLYGYNY_BIRDS_PERCENTAGE = 0.3;
 
-    public Bird applyBirdMatingOptimizer(List<ElderDTO> elders, OpportunityDTO opportunity) throws NoSuchBirdException {
+    @Override
+    public OptimizationResult applyOptimization(List<ElderDTO> elders) {
+        Bird bird = applyBirdMatingOptimizer(elders);
+        OptimizationResult optimizationResult = new OptimizationResult(bird.getMatchingScore(), bird.getElders());
+        optimizationResult.setSkillsMatchingOffer(bird.getGenes());
+        LOGGER.info("Result from bird optimization for each opportunity skill: {}.", bird.getGenes());
+        return optimizationResult;
+    }
+
+    public Bird applyBirdMatingOptimizer(List<ElderDTO> elders){
         double largestMatchingScore = elders.get(0).getMatchingPercentage(); // largest score in elders
         long bestMatchNrOSkills;
         List<Bird> population = initializePopulation(elders);

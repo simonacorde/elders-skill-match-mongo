@@ -1,16 +1,18 @@
 package diploma.elders.up.service;
 
-import diploma.elders.up.bin.packing.BinPackingOptimizerService;
-import diploma.elders.up.bin.packing.domain.Bin;
-import diploma.elders.up.bird.optimizer.BirdMatingOptimizerService;
-import diploma.elders.up.bird.optimizer.NoSuchBirdException;
-import diploma.elders.up.bird.optimizer.domain.Bird;
+import diploma.elders.up.optimization.OptimizerService;
+import diploma.elders.up.optimization.bin.packing.BinPackingOptimizerService;
+import diploma.elders.up.optimization.domain.Bin;
+import diploma.elders.up.optimization.bird.optimizer.BirdMatingOptimizerService;
+import diploma.elders.up.optimization.bird.optimizer.NoSuchBirdException;
+import diploma.elders.up.optimization.domain.Bird;
 import diploma.elders.up.dao.documents.Opportunity;
 import diploma.elders.up.dao.documents.Senior;
 import diploma.elders.up.dao.repository.OpportunityRepository;
 import diploma.elders.up.dao.repository.SeniorRepository;
 import diploma.elders.up.dto.ElderDTO;
 import diploma.elders.up.dto.OpportunityDTO;
+import diploma.elders.up.optimization.domain.OptimizationResult;
 import diploma.elders.up.semantic.matching.ParallelMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,9 +35,7 @@ public class MatchingService {
     @Autowired
     private SeniorRepository elderRepository;
     @Autowired
-    private BinPackingOptimizerService binPackingOptimizerService;
-    @Autowired
-    private BirdMatingOptimizerService birdMatingOptimizerService;
+    private OptimizerService optimizerService;
     @Autowired
     private OpportunityRepository opportunityRepository;
     @Autowired
@@ -63,13 +63,9 @@ public class MatchingService {
     public void applyMatchingAlgorithm(int size) throws NoSuchBirdException, ExecutionException, InterruptedException {
         Opportunity opportunity = opportunityRepository.findAll().get(0);
         OpportunityDTO opportunityDTO = new OpportunityDTO(opportunity);
-        Bird bird = birdMatingOptimizerService.applyBirdMatingOptimizer(computeEldersMatchingWithOpportunity(opportunityDTO, size), opportunityDTO);
-        LOGGER.info("Found for opportunity: " + opportunity.getId() + " the solution containing skills: " + bird.getGenes() + " with matching score: " + bird.getMatchingScore());
-        int skills = 0;
-        for(ElderDTO elderDTO : bird.getElders()){
-            skills += elderDTO.getElder().getSkills().size();
-        }
-        LOGGER.info("Matching score : {} with a number of {} elders and with a total number of skills : {}!", bird.getMatchingScore(), bird.getElders().size(),skills);
+        LOGGER.info("Applying matching algorithm for opportunity: {} with a number of {} elders.", opportunityDTO, size);
+        OptimizationResult optimizationResult = optimizerService.applyOptimization(computeEldersMatchingWithOpportunity(opportunityDTO, size));
+        LOGGER.info("Matching score : {} with a number of {} elders!", optimizationResult.getMatchingScore(), optimizationResult.getElders().size());
     }
 
     private List<Senior> randomList(List<Senior> seniors, int size){
@@ -80,19 +76,5 @@ public class MatchingService {
             generated.add(seniors.get(next));
         }
         return generated;
-    }
-
-    public void applyMatchingPlusBinPacking() {
-        Opportunity opportunity = opportunityRepository.findAll().get(0);
-        OpportunityDTO opportunityDTO = new OpportunityDTO(opportunity);
-        Bin bin = null;
-        try {
-            bin = binPackingOptimizerService.applyBinPackingOptimizer(computeEldersMatchingWithOpportunity(opportunityDTO, 100), opportunityDTO);
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        LOGGER.info("Found for opportunity: " + opportunity.getId() + " the solution containing elders: " + bin.getResult().toString() + " with matching score: " + bin.getValue());
     }
 }
