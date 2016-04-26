@@ -1,5 +1,7 @@
 package diploma.elders.up.semantic.matching;
 
+import diploma.elders.up.dao.documents.MatchingResult;
+import diploma.elders.up.dao.repository.MatchingResultRepository;
 import diploma.elders.up.dto.ElderComparator;
 import diploma.elders.up.dto.ElderDTO;
 import diploma.elders.up.dto.OpportunityDTO;
@@ -26,6 +28,8 @@ public class ParallelMatcher {
 
     @Autowired
     private OntologySemanticMatcher ontologySemanticMatcher;
+    @Autowired
+    private MatchingResultRepository matchingResultRepository;
 
     public List<ElderDTO> findMatchingCandidates(OpportunityDTO op, List<ElderDTO> candidates, int size) {
         List<ElderDTO> matchingElders = new ArrayList<>();
@@ -38,8 +42,7 @@ public class ParallelMatcher {
             resultList.add(result);
         }
 
-        for(Future future : resultList)
-        {
+        for(Future future : resultList) {
             try {
                 ElderDTO matchedElder = (ElderDTO)future.get();
                 matchingElders.add(matchedElder);
@@ -55,6 +58,7 @@ public class ParallelMatcher {
         if (matchingElders.size() > size) {
             return matchingElders.subList(0, size);
         }
+        matchingResultRepository.save(new MatchingResult(matchingElders, op.getOpportunity().getId()));
         return matchingElders;
 
     }

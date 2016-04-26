@@ -1,11 +1,11 @@
 package diploma.elders.up.optimization.bin.packing;
 
+import diploma.elders.up.dao.documents.OptimizationResult;
+import diploma.elders.up.dto.ElderDTO;
 import diploma.elders.up.optimization.OptimizerService;
 import diploma.elders.up.optimization.domain.Bin;
-import diploma.elders.up.optimization.domain.OptimizationResult;
 import diploma.elders.up.optimization.domain.Tuple;
 import diploma.elders.up.optimization.domain.TupleComparator;
-import diploma.elders.up.dto.ElderDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

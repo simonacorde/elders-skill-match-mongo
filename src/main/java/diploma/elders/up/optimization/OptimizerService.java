@@ -1,7 +1,7 @@
 package diploma.elders.up.optimization;
 
+import diploma.elders.up.dao.documents.OptimizationResult;
 import diploma.elders.up.dto.ElderDTO;
-import diploma.elders.up.optimization.domain.OptimizationResult;
 
 import java.util.List;
 

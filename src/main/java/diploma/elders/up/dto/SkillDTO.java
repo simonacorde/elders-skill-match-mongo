@@ -11,7 +11,6 @@ public class SkillDTO {
     private double matchingScore;
     private Skill skill;
     private boolean matched = false;
-    private int opportunityPosition = -1;
 
     public SkillDTO() {
     }
@@ -31,14 +30,6 @@ public class SkillDTO {
 
     public void setMatchingSkill(SkillDTO matchingSkill) {
         this.matchingSkill = matchingSkill;
-    }
-
-    public int getOpportunityPosition() {
-        return opportunityPosition;
-    }
-
-    public void setOpportunityPosition(int opportunityPosition) {
-        this.opportunityPosition = opportunityPosition;
     }
 
     public double getMatchingScore() {
@@ -83,7 +74,6 @@ public class SkillDTO {
 
         if (Double.compare(skillDTO.matchingScore, matchingScore) != 0) return false;
         if (matched != skillDTO.matched) return false;
-        if (opportunityPosition != skillDTO.opportunityPosition) return false;
         if (matchingSkill != null ? !matchingSkill.equals(skillDTO.matchingSkill) : skillDTO.matchingSkill != null)
             return false;
         return !(skill != null ? !skill.equals(skillDTO.skill) : skillDTO.skill != null);
@@ -99,7 +89,6 @@ public class SkillDTO {
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + (skill != null ? skill.hashCode() : 0);
         result = 31 * result + (matched ? 1 : 0);
-        result = 31 * result + opportunityPosition;
         return result;
     }
 }

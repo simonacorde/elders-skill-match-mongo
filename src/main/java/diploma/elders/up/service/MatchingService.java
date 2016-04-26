@@ -1,18 +1,14 @@
 package diploma.elders.up.service;
 
-import diploma.elders.up.optimization.OptimizerService;
-import diploma.elders.up.optimization.bin.packing.BinPackingOptimizerService;
-import diploma.elders.up.optimization.domain.Bin;
-import diploma.elders.up.optimization.bird.optimizer.BirdMatingOptimizerService;
-import diploma.elders.up.optimization.bird.optimizer.NoSuchBirdException;
-import diploma.elders.up.optimization.domain.Bird;
 import diploma.elders.up.dao.documents.Opportunity;
+import diploma.elders.up.dao.documents.OptimizationResult;
 import diploma.elders.up.dao.documents.Senior;
 import diploma.elders.up.dao.repository.OpportunityRepository;
 import diploma.elders.up.dao.repository.SeniorRepository;
 import diploma.elders.up.dto.ElderDTO;
 import diploma.elders.up.dto.OpportunityDTO;
-import diploma.elders.up.optimization.domain.OptimizationResult;
+import diploma.elders.up.optimization.OptimizerService;
+import diploma.elders.up.optimization.bird.optimizer.NoSuchBirdException;
 import diploma.elders.up.semantic.matching.ParallelMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +57,7 @@ public class MatchingService {
     }
 
     public void applyMatchingAlgorithm(int size) throws NoSuchBirdException, ExecutionException, InterruptedException {
-        Opportunity opportunity = opportunityRepository.findAll().get(0);
+        Opportunity opportunity = opportunityRepository.findAll().get(8);
         OpportunityDTO opportunityDTO = new OpportunityDTO(opportunity);
         LOGGER.info("Applying matching algorithm for opportunity: {} with a number of {} elders.", opportunityDTO, size);
         OptimizationResult optimizationResult = optimizerService.applyOptimization(computeEldersMatchingWithOpportunity(opportunityDTO, size));

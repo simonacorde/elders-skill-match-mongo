@@ -1,11 +1,19 @@
 package diploma.elders.up.optimization.bird.optimizer;
 
-import diploma.elders.up.optimization.OptimizerService;
-import diploma.elders.up.optimization.domain.*;
+import diploma.elders.up.dao.documents.OptimizationParams;
+import diploma.elders.up.dao.documents.OptimizationResult;
+import diploma.elders.up.dao.repository.OptimizationParamsRepository;
+import diploma.elders.up.dao.repository.OptimizationResultRepository;
 import diploma.elders.up.dto.ElderDTO;
 import diploma.elders.up.dto.SkillDTO;
+import diploma.elders.up.optimization.OptimizerService;
+import diploma.elders.up.optimization.domain.Bird;
+import diploma.elders.up.optimization.domain.BirdComparator;
+import diploma.elders.up.optimization.domain.BirdGender;
+import diploma.elders.up.optimization.domain.BirdType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -19,23 +27,33 @@ public class BirdMatingOptimizerService implements OptimizerService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BirdMatingOptimizerService.class);
 
-    private static final double THRESHOLD = 0.78;
+    @Autowired
+    private OptimizationParamsRepository optimizationParamsRepository;
+    @Autowired
+    private OptimizationResultRepository optimizationResultRepository;
+
+    private static final double THRESHOLD = 0.90;
     private static final int FEMALE_MATES = 3;
     private static final double MONOGAMOUS_BIRDS_PERCENTAGE = 0.5;
     private static final double MALE_POLYGYNY_BIRDS_PERCENTAGE = 0.3;
 
     @Override
     public OptimizationResult applyOptimization(List<ElderDTO> elders) {
+        long start = System.currentTimeMillis();
         Bird bird = applyBirdMatingOptimizer(elders);
-        OptimizationResult optimizationResult = new OptimizationResult(bird.getMatchingScore(), bird.getElders());
+        long time = System.currentTimeMillis() - start;
+        LOGGER.info("Time needed to execute optimization in milliseconds: " + time);
+        OptimizationParams optimizationParams = new OptimizationParams(time, bird.getMatchingScore(), MONOGAMOUS_BIRDS_PERCENTAGE, MALE_POLYGYNY_BIRDS_PERCENTAGE, FEMALE_MATES, elders.size(), bird.getGenes().size(), bird.getElders().size());
+        OptimizationParams save = optimizationParamsRepository.save(optimizationParams);
+        OptimizationResult optimizationResult = new OptimizationResult(bird.getMatchingScore(), bird.getElders(), save.getId());
         optimizationResult.setSkillsMatchingOffer(bird.getGenes());
         LOGGER.info("Result from bird optimization for each opportunity skill: {}.", bird.getGenes());
+        optimizationResultRepository.save(optimizationResult);
         return optimizationResult;
     }
 
     public Bird applyBirdMatingOptimizer(List<ElderDTO> elders){
         double largestMatchingScore = elders.get(0).getMatchingPercentage(); // largest score in elders
-        long bestMatchNrOSkills;
         List<Bird> population = initializePopulation(elders);
 
         while(largestMatchingScore <= THRESHOLD && areThereAnyUnmatedBrids(population) && population.size() > 2) {
@@ -56,8 +74,7 @@ public class BirdMatingOptimizerService implements OptimizerService{
             if (!population.isEmpty()) {
                 Collections.sort(population, new BirdComparator());
                 largestMatchingScore = population.get(0).getMatchingScore();
-                bestMatchNrOSkills = population.get(0).getGenes().stream().count();
-                LOGGER.info("Largest score so far: " + largestMatchingScore + "  Population size: " + population.size() + " with nr of skills: " + bestMatchNrOSkills);
+                LOGGER.info("Largest score so far: " + largestMatchingScore + "  Population size: " + population.size() + " with nr of elders in solution: " + population.get(0).getElders().size());
             }
         }
         return population.get(0);
