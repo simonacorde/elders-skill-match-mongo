@@ -32,10 +32,10 @@ public class BirdMatingOptimizerService implements OptimizerService{
     @Autowired
     private OptimizationResultRepository optimizationResultRepository;
 
-    private static final double THRESHOLD = 0.90;
-    private static final int FEMALE_MATES = 3;
+    private static final double THRESHOLD = 0.92;
+    private static final int FEMALE_MATES = 4;
     private static final double MONOGAMOUS_BIRDS_PERCENTAGE = 0.5;
-    private static final double MALE_POLYGYNY_BIRDS_PERCENTAGE = 0.3;
+    private static final double MALE_POLYGYNY_BIRDS_PERCENTAGE = 0.2;
 
     @Override
     public OptimizationResult applyOptimization(List<ElderDTO> elders) {
@@ -55,6 +55,7 @@ public class BirdMatingOptimizerService implements OptimizerService{
     public Bird applyBirdMatingOptimizer(List<ElderDTO> elders){
         double largestMatchingScore = elders.get(0).getMatchingPercentage(); // largest score in elders
         List<Bird> population = initializePopulation(elders);
+        List<Bird> bestBirds = new ArrayList<>();
 
         while(largestMatchingScore <= THRESHOLD && areThereAnyUnmatedBrids(population) && population.size() > 2) {
             classifyPopulation(population);
@@ -75,8 +76,20 @@ public class BirdMatingOptimizerService implements OptimizerService{
                 Collections.sort(population, new BirdComparator());
                 largestMatchingScore = population.get(0).getMatchingScore();
                 LOGGER.info("Largest score so far: " + largestMatchingScore + "  Population size: " + population.size() + " with nr of elders in solution: " + population.get(0).getElders().size());
+                bestBirds.add(population.get(0));
             }
         }
+        //choose from birds with duplicate score the ones with the smallest nr of CVs
+        population.clear();
+        ListIterator<Bird> birdListIterator = bestBirds.listIterator();
+        while(birdListIterator.hasNext()){
+            Bird next = birdListIterator.next();
+            Bird min = bestBirds.stream().filter(b -> b.getMatchingScore() == next.getMatchingScore()).min(Comparator.comparing(b -> b.getElders().size())).get();
+            population.add(min);
+            bestBirds.remove(next);
+            birdListIterator = bestBirds.listIterator();
+        }
+        Collections.sort(population, new BirdComparator());
         return population.get(0);
     }
 
@@ -97,10 +110,6 @@ public class BirdMatingOptimizerService implements OptimizerService{
                     return Collections.singletonList(bestBird);
                 }
 
-                List<ElderDTO> collect = femalesToMate.stream().map(Bird::getElders).flatMap(List::stream).collect(Collectors.toList());
-                Bird brood = new Bird();
-                brood.setMated(false);
-                brood.setElders(union(male.getElders(), collect));
                 male.setMated(true);
                 male.increaseNrOfMates();
                 for(Bird femaleToMate: femalesToMate){
@@ -109,8 +118,19 @@ public class BirdMatingOptimizerService implements OptimizerService{
                         femaleToMate.setMated(true);
                     }
                 }
-                List<Double> broodDNA = naturalSelectionOfGenes(male, femalesToMate);
+
+                List<Bird> broods = naturalSelectionOfGenes(male, femalesToMate);
+                Double[] broodGenes = new Double[male.getGenes().size()];
+                for(int i=0;i<male.getGenes().size(); i++){
+                    Double aDouble = broods.get(i).getGenes().get(i);
+                    broodGenes[i] = aDouble;
+                }
+                List<Double> broodDNA = Arrays.asList(broodGenes);
                 double match = broodDNA.stream().mapToDouble(i->i).average().getAsDouble();
+
+                Bird brood = new Bird();
+                brood.setMated(false);
+                brood.setElders(broods.stream().map(Bird::getElders).flatMap(Collection::stream).collect(Collectors.toList()));
                 brood.setMatchingScore(match);
                 brood.setGenes(broodDNA);
                 newPopulation.add(brood);
@@ -130,18 +150,21 @@ public class BirdMatingOptimizerService implements OptimizerService{
         }
         return newPopulation;
     }
-    private List<Double> naturalSelectionOfGenes(Bird male, List<Bird> females) {
-        Double[] broodDNA = new Double[male.getGenes().size()];
+    private List<Bird> naturalSelectionOfGenes(Bird male, List<Bird> females) {
+        Bird[] broodDNA = new Bird[male.getGenes().size()];
         for(int i=0; i < male.getGenes().size(); i++){
-            List<Double> genesOnPosition = new ArrayList<>();
-            genesOnPosition.add(male.getGenes().get(i));
-            for(Bird female: females){
-                genesOnPosition.add(female.getGenes().get(i));
-            }
-            OptionalDouble max = genesOnPosition.stream().mapToDouble(g -> g).max();
-            broodDNA[i] = max.getAsDouble();
+            List<Bird> birds = new ArrayList<>();
+            birds.add(male);
+            birds.addAll(females);
+            Bird maxBird = findMaxOnPosition(birds, i);
+            broodDNA[i] = maxBird;
         }
         return Arrays.asList(broodDNA);
+    }
+
+    private Bird findMaxOnPosition(List<Bird> birds, int i) {
+        double asDouble = birds.stream().mapToDouble(b -> b.getGenes().get(i)).max().getAsDouble();
+        return birds.stream().filter(b->b.getGenes().get(i) == asDouble).findFirst().get();
     }
 
     private boolean areThereAnyUnmatedBrids(List<Bird> birds){
