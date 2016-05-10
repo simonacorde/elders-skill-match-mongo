@@ -1,7 +1,5 @@
 package diploma.elders.up.optimization.domain;
 
-import diploma.elders.up.dto.ElderDTO;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,13 +12,11 @@ public class Bird {
     private BirdType birdType;
     private double matchingScore;
     private boolean mated;
-    private List<ElderDTO> elders;
     private int nrOfMates = 0;
-    private List<Double> genes;
+    private List<Genome> genome;
 
     public Bird() {
-        genes = new ArrayList<>();
-        elders = new ArrayList<>();
+        genome = new ArrayList<>();
     }
 
     public BirdGender getBirdGender() {
@@ -47,28 +43,12 @@ public class Bird {
         this.matchingScore = matchingScore;
     }
 
-    public List<ElderDTO> getElders() {
-        return elders;
+    public List<Genome> getGenome() {
+        return genome;
     }
 
-    public void addElder(ElderDTO elder) {
-        elders.add(elder);
-    }
-
-    public void setElders(List<ElderDTO> elders) {
-        this.elders = elders;
-    }
-
-    public List<Double> getGenes() {
-        return genes;
-    }
-
-    public void setGenes(List<Double> genes) {
-        this.genes = genes;
-    }
-
-    public void addGene(Double gene) {
-        genes.add(gene);
+    public void setGenome(List<Genome> genome) {
+        this.genome = genome;
     }
 
     public boolean isMated() {
@@ -103,7 +83,7 @@ public class Bird {
                 ", birdType=" + birdType +
                 ", matchingScore=" + matchingScore +
                 ", mated=" + mated +
-                ", genes=" + genes +
+                ", genome=" + genome +
                 ", nrOfMates=" + nrOfMates +
                 '}';
     }

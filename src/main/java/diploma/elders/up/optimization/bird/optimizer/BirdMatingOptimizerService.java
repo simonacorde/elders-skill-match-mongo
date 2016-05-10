@@ -7,10 +7,7 @@ import diploma.elders.up.dao.repository.OptimizationResultRepository;
 import diploma.elders.up.dto.ElderDTO;
 import diploma.elders.up.dto.SkillDTO;
 import diploma.elders.up.optimization.OptimizerService;
-import diploma.elders.up.optimization.domain.Bird;
-import diploma.elders.up.optimization.domain.BirdComparator;
-import diploma.elders.up.optimization.domain.BirdGender;
-import diploma.elders.up.optimization.domain.BirdType;
+import diploma.elders.up.optimization.domain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +29,8 @@ public class BirdMatingOptimizerService implements OptimizerService{
     @Autowired
     private OptimizationResultRepository optimizationResultRepository;
 
-    private static final double THRESHOLD = 0.92;
-    private static final int FEMALE_MATES = 4;
+    private static final double THRESHOLD = 0.98;
+    private static final int FEMALE_MATES = 3;
     private static final double MONOGAMOUS_BIRDS_PERCENTAGE = 0.5;
     private static final double MALE_POLYGYNY_BIRDS_PERCENTAGE = 0.2;
 
@@ -43,11 +40,11 @@ public class BirdMatingOptimizerService implements OptimizerService{
         Bird bird = applyBirdMatingOptimizer(elders);
         long time = System.currentTimeMillis() - start;
         LOGGER.info("Time needed to execute optimization in milliseconds: " + time);
-        OptimizationParams optimizationParams = new OptimizationParams(time, bird.getMatchingScore(), MONOGAMOUS_BIRDS_PERCENTAGE, MALE_POLYGYNY_BIRDS_PERCENTAGE, FEMALE_MATES, elders.size(), bird.getGenes().size(), bird.getElders().size());
+        OptimizationParams optimizationParams = new OptimizationParams(time, bird.getMatchingScore(), MONOGAMOUS_BIRDS_PERCENTAGE, MALE_POLYGYNY_BIRDS_PERCENTAGE, FEMALE_MATES, elders.size(), bird.getGenome().size(), bird.getGenome().stream().map(Genome::getElder).distinct().collect(Collectors.toList()).size());
         OptimizationParams save = optimizationParamsRepository.save(optimizationParams);
-        OptimizationResult optimizationResult = new OptimizationResult(bird.getMatchingScore(), bird.getElders(), save.getId());
-        optimizationResult.setSkillsMatchingOffer(bird.getGenes());
-        LOGGER.info("Result from bird optimization for each opportunity skill: {}.", bird.getGenes());
+        OptimizationResult optimizationResult = new OptimizationResult(bird.getMatchingScore(), bird.getGenome().stream().map(Genome::getElder).distinct().collect(Collectors.toList()), save.getId());
+        optimizationResult.setSkillsMatchingOffer(bird.getGenome().stream().map(Genome::getGeneScore).collect(Collectors.toList()));
+        LOGGER.info("Result from bird optimization for each opportunity skill: {}.", bird.getGenome().stream().map(Genome::getGeneScore).collect(Collectors.toList()));
         optimizationResultRepository.save(optimizationResult);
         return optimizationResult;
     }
@@ -75,7 +72,7 @@ public class BirdMatingOptimizerService implements OptimizerService{
             if (!population.isEmpty()) {
                 Collections.sort(population, new BirdComparator());
                 largestMatchingScore = population.get(0).getMatchingScore();
-                LOGGER.info("Largest score so far: " + largestMatchingScore + "  Population size: " + population.size() + " with nr of elders in solution: " + population.get(0).getElders().size());
+                LOGGER.info("Largest score so far: " + largestMatchingScore + "  Population size: " + population.size() + " with nr of elders in solution: " + population.get(0).getGenome().stream().map(Genome::getElder).distinct().collect(Collectors.toList()).size());
                 bestBirds.add(population.get(0));
             }
         }
@@ -84,7 +81,7 @@ public class BirdMatingOptimizerService implements OptimizerService{
         ListIterator<Bird> birdListIterator = bestBirds.listIterator();
         while(birdListIterator.hasNext()){
             Bird next = birdListIterator.next();
-            Bird min = bestBirds.stream().filter(b -> b.getMatchingScore() == next.getMatchingScore()).min(Comparator.comparing(b -> b.getElders().size())).get();
+            Bird min = bestBirds.stream().filter(b -> b.getMatchingScore() == next.getMatchingScore()).min(Comparator.comparing(b -> b.getGenome().stream().map(Genome::getElder).distinct().collect(Collectors.toList()).size())).get();
             population.add(min);
             bestBirds.remove(next);
             birdListIterator = bestBirds.listIterator();
@@ -119,20 +116,12 @@ public class BirdMatingOptimizerService implements OptimizerService{
                     }
                 }
 
-                List<Bird> broods = naturalSelectionOfGenes(male, femalesToMate);
-                Double[] broodGenes = new Double[male.getGenes().size()];
-                for(int i=0;i<male.getGenes().size(); i++){
-                    Double aDouble = broods.get(i).getGenes().get(i);
-                    broodGenes[i] = aDouble;
-                }
-                List<Double> broodDNA = Arrays.asList(broodGenes);
-                double match = broodDNA.stream().mapToDouble(i->i).average().getAsDouble();
-
+                List<Genome> genome = naturalSelectionOfGenes(male, femalesToMate);;
+                double match = genome.stream().mapToDouble(Genome::getGeneScore).average().getAsDouble();
                 Bird brood = new Bird();
                 brood.setMated(false);
-                brood.setElders(broods.stream().map(Bird::getElders).flatMap(Collection::stream).collect(Collectors.toList()));
                 brood.setMatchingScore(match);
-                brood.setGenes(broodDNA);
+                brood.setGenome(genome);
                 newPopulation.add(brood);
                 if(match >= THRESHOLD){
                     return newPopulation;
@@ -150,21 +139,21 @@ public class BirdMatingOptimizerService implements OptimizerService{
         }
         return newPopulation;
     }
-    private List<Bird> naturalSelectionOfGenes(Bird male, List<Bird> females) {
-        Bird[] broodDNA = new Bird[male.getGenes().size()];
-        for(int i=0; i < male.getGenes().size(); i++){
+    private List<Genome> naturalSelectionOfGenes(Bird male, List<Bird> females) {
+        Genome[] genome = new Genome[male.getGenome().size()];
+        for(int i=0; i < male.getGenome().size(); i++){
             List<Bird> birds = new ArrayList<>();
             birds.add(male);
             birds.addAll(females);
-            Bird maxBird = findMaxOnPosition(birds, i);
-            broodDNA[i] = maxBird;
+            Genome maxGenome = findMaxOnPosition(birds, i);
+            genome[i] = maxGenome;
         }
-        return Arrays.asList(broodDNA);
+        return Arrays.asList(genome);
     }
 
-    private Bird findMaxOnPosition(List<Bird> birds, int i) {
-        double asDouble = birds.stream().mapToDouble(b -> b.getGenes().get(i)).max().getAsDouble();
-        return birds.stream().filter(b->b.getGenes().get(i) == asDouble).findFirst().get();
+    private Genome findMaxOnPosition(List<Bird> birds, int i) {
+        double asDouble = birds.stream().mapToDouble(b -> b.getGenome().get(i).getGeneScore()).max().getAsDouble();
+        return birds.stream().filter(b->b.getGenome().get(i).getGeneScore() == asDouble).map(b -> b.getGenome().get(i)).findFirst().get();
     }
 
     private boolean areThereAnyUnmatedBrids(List<Bird> birds){
@@ -200,23 +189,16 @@ public class BirdMatingOptimizerService implements OptimizerService{
 
         for(ElderDTO elderDTO : elders){
             Bird bird = new Bird();
-            bird.addElder(elderDTO);
+            List<Genome> genome = new ArrayList<>();
+            for(SkillDTO skillDTO : elderDTO.getMatchingSkills()){
+                Genome gene = new Genome(elderDTO, skillDTO.getMatchingScore());
+                genome.add(gene);
+            }
             bird.setMatchingScore(elderDTO.getMatchingPercentage());
-            bird.setGenes(elderDTO.getMatchingSkills().stream().map(SkillDTO::getMatchingScore).collect(Collectors.toList()));
             bird.setMated(false);
-
+            bird.setGenome(genome);
             population.add(bird);
         }
         return population;
-    }
-
-    private List<ElderDTO> union(List<ElderDTO> male, List<ElderDTO> female){
-        List<ElderDTO> al = new ArrayList<>();
-        Set<ElderDTO> set = new HashSet<>();
-        set.addAll(male);
-        set.addAll(female);
-        al.clear();
-        al.addAll(set);
-        return al;
     }
 }

@@ -3,12 +3,12 @@ package diploma.elders.up.service;
 import diploma.elders.up.dao.documents.Opportunity;
 import diploma.elders.up.dao.documents.OptimizationResult;
 import diploma.elders.up.dao.documents.Senior;
+import diploma.elders.up.dao.repository.MatchingResultRepository;
 import diploma.elders.up.dao.repository.OpportunityRepository;
 import diploma.elders.up.dao.repository.SeniorRepository;
 import diploma.elders.up.dto.ElderDTO;
 import diploma.elders.up.dto.OpportunityDTO;
 import diploma.elders.up.optimization.OptimizerService;
-import diploma.elders.up.optimization.bird.optimizer.NoSuchBirdException;
 import diploma.elders.up.semantic.matching.ParallelMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +36,8 @@ public class MatchingService {
     private OpportunityRepository opportunityRepository;
     @Autowired
     private ParallelMatcher parallelMatcher;
+    @Autowired
+    private MatchingResultRepository matchingResultRepository;
 
     private List<Senior> getElderCVs(int size){
         Iterator<Senior> all = elderRepository.findAll().iterator();
@@ -56,12 +58,15 @@ public class MatchingService {
         return parallelMatcher.findMatchingCandidates(opportunity, eldersMatched, size);
     }
 
-    public void applyMatchingAlgorithm(int size) throws NoSuchBirdException, ExecutionException, InterruptedException {
-        Opportunity opportunity = opportunityRepository.findAll().get(8);
+    public OptimizationResult applyMatchingAlgorithm(int size, String opportunityId) throws ExecutionException, InterruptedException {
+        //Opportunity opportunity = opportunityRepository.findAll().get(28);
+        Opportunity opportunity = opportunityRepository.findOne(opportunityId);
         OpportunityDTO opportunityDTO = new OpportunityDTO(opportunity);
         LOGGER.info("Applying matching algorithm for opportunity: {} with a number of {} elders.", opportunityDTO, size);
         OptimizationResult optimizationResult = optimizerService.applyOptimization(computeEldersMatchingWithOpportunity(opportunityDTO, size));
+        //OptimizationResult optimizationResult = optimizerService.applyOptimization(matchingResultRepository.findOne("5728d761bba552f756fd132c").getElders());
         LOGGER.info("Matching score : {} with a number of {} elders!", optimizationResult.getMatchingScore(), optimizationResult.getElders().size());
+        return optimizationResult;
     }
 
     private List<Senior> randomList(List<Senior> seniors, int size){
