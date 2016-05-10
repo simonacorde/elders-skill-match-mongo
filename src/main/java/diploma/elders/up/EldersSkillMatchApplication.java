@@ -1,12 +1,12 @@
 package diploma.elders.up;
 
+import diploma.elders.up.dao.repository.MatchingResultRepository;
 import diploma.elders.up.dao.repository.SeniorRepository;
 import diploma.elders.up.dao.repository.SkillRepository;
+import diploma.elders.up.dao.repository.UserRepository;
 import diploma.elders.up.data.DataGenerator;
 import diploma.elders.up.ontology.OntologyReader;
 import diploma.elders.up.service.MatchingService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -17,10 +17,6 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @SpringBootApplication
 @EnableMongoRepositories
 public class EldersSkillMatchApplication {
-
-    private static final Logger log = LoggerFactory.getLogger(EldersSkillMatchApplication.class);
-    private static final String THING = "[owl:Thing]";
-
     public static void main(String[] args) {
         SpringApplication.run(EldersSkillMatchApplication.class, args);
     }
@@ -35,6 +31,10 @@ public class EldersSkillMatchApplication {
     private SeniorRepository seniorRepository;
     @Autowired
     private MatchingService matchingService;
+    @Autowired
+    private MatchingResultRepository matchingResultRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @Bean
     public CommandLineRunner demo() {
@@ -63,7 +63,9 @@ public class EldersSkillMatchApplication {
 //            }
 //            Company company = dataGenerator.generateCompany();
 //            dataGenerator.generateOpportunity(3, 5, 8, 12);
-            matchingService.applyMatchingAlgorithm(1000);
+
+//            log.info("Opp id: " + matchingResultRepository.findAll().get(0).getOpportunityId());
+//            matchingService.applyMatchingAlgorithm(1000);
 //            int treeDepth1 = semanticMatchingAlgorithm.findTreeDepth(repository.findByName("domain_specific_skills_and_competences"));
 //            int treeDepth2 = semanticMatchingAlgorithm.findTreeDepth(repository.findByName("non_domain_specific_skills_and_competences"));
 //
@@ -71,6 +73,8 @@ public class EldersSkillMatchApplication {
 //            log.info("Tree depth 2: "+ treeDepth2);
 
 //            matchingService.applyMatchingPlusBinPacking();
+//            userRepository.save(new User("hr", "hr", UserRole.USER));
+//            userRepository.save(new User("admin", "admin", UserRole.ADMIN));
         };
     }
 }

@@ -14,6 +14,9 @@ public class Skill {
     private String name;
     private String parentName;
 
+    public Skill() {
+    }
+
     public Skill(String id, String name, String parentName) {
         this.id = id;
         this.name = name;

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+        >
+<head>
+    <title>Result</title>
+</head>
+<body>
+<h1 th:inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h1>
+<table border="1" style="width:300px">
+    <tr>
+        <td>Matching Result</td>
+    </tr>
+    <tr>
+        <td th:text="${score}">Matching Score</td>
+    </tr>
+    <tr>
+        <td>Matched CVs</td>
+    </tr>
+    <th:block th:each="elder : ${elders}">
+        <tr>
+            <td th:text="${elder.name}">Name</td>
+            <th:block th:each="skill : ${elder.skills}">
+                <tr>
+                    <td th:text="${skill.name}">Skill</td>
+                </tr>
+            </th:block>
+        </tr>
+    </th:block>
+</table>
+<form th:action="@{/logout}" method="post">
+    <input type="submit" value="Sign Out"/>
+</form>
+</body>
+</html>

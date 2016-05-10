@@ -17,6 +17,9 @@ public class Opportunity {
     private Company company;
     private List<Skill> skills;
 
+    public Opportunity() {
+    }
+
     public Opportunity(String title, Company company) {
         this.title = title;
         this.company = company;
