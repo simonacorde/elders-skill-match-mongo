@@ -29,14 +29,9 @@ public class ElderController {
     @Autowired
     private OpportunityRepository opportunityRepository;
 
-    @RequestMapping(value = "/home")
-    public String home() {
-        return "home";
-    }
-
     @RequestMapping(value = "/")
     public String homeIndex() {
-        return "home";
+        return "hello";
     }
 
     @RequestMapping(value = "/hello")

@@ -2,20 +2,92 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
         >
 <head>
-    <title>Result</title>
+    <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'/>
+    <title>Matching Result</title>
+    <style>
+        body {
+            background: url('http://i.imgur.com/Eor57Ae.jpg') no-repeat fixed center center;
+            background-size: cover;
+            font-family: Montserrat;
+        }
+
+        .logo {
+            text-align: center;
+            width: 300px;
+            height: 36px;
+            color: #fff;
+            font-family: Montserrat;
+            margin: 30px auto;
+        }
+
+        .match-result-block {
+            width: 320px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 5px;
+            border-top: 5px solid #ff656c;
+            margin: 0 auto;
+        }
+
+        .match-result-block h1 {
+            text-align: center;
+            color: #000;
+            font-size: 18px;
+            text-transform: uppercase;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .match-result-block input {
+            width: 100%;
+            height: 42px;
+            box-sizing: border-box;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-family: Montserrat;
+            padding: 0 20px 0 50px;
+            outline: none;
+        }
+
+
+        .match-result-block input {
+            width: 100%;
+            height: 40px;
+            background: #ff656c;
+            box-sizing: border-box;
+            border-radius: 5px;
+            border: 1px solid #e15960;
+            color: #fff;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 14px;
+            font-family: Montserrat;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .match-result-block input:hover {
+            background: #ff7b81;
+        }
+
+    </style>
 </head>
 <body>
-<h1 th:inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h1>
+<div class="logo">
+<tr>
+    <td>Matching Result</td>
+</tr>
+<tr>
+    <td th:text="${score}">Matching Score</td>
+</tr>
+<tr>
+    <td>Matched CVs</td>
+</tr>
+    </div>
+<div class="match-result-block">
 <table border="1" style="width:300px">
-    <tr>
-        <td>Matching Result</td>
-    </tr>
-    <tr>
-        <td th:text="${score}">Matching Score</td>
-    </tr>
-    <tr>
-        <td>Matched CVs</td>
-    </tr>
     <th:block th:each="elder : ${elders}">
         <tr>
             <td th:text="${elder.name}">Name</td>
@@ -27,6 +99,7 @@
         </tr>
     </th:block>
 </table>
+</div>
 <form th:action="@{/logout}" method="post">
     <input type="submit" value="Sign Out"/>
 </form>
