@@ -6,7 +6,10 @@ import diploma.elders.up.dao.repository.SkillRepository;
 import diploma.elders.up.dao.repository.UserRepository;
 import diploma.elders.up.data.DataGenerator;
 import diploma.elders.up.ontology.OntologyReader;
+import diploma.elders.up.semantic.matching.PSOMatchingAlgorithm;
 import diploma.elders.up.service.MatchingService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -17,6 +20,10 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @SpringBootApplication
 @EnableMongoRepositories
 public class EldersSkillMatchApplication {
+
+    private static final Logger log = LoggerFactory.getLogger(EldersSkillMatchApplication.class);
+    private static final String THING = "[owl:Thing]";
+
     public static void main(String[] args) {
         SpringApplication.run(EldersSkillMatchApplication.class, args);
     }
@@ -35,6 +42,9 @@ public class EldersSkillMatchApplication {
     private MatchingResultRepository matchingResultRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PSOMatchingAlgorithm pso;
+
 
     @Bean
     public CommandLineRunner demo() {

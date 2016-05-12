@@ -184,8 +184,24 @@ public class OntologyLikeOperations {
         String parent = skillRepository.findByName(childName).getParent();
         return skillRepository.findByName(parent);
     }
+    public Skill getParent(Skill child){
+        String parent = skillRepository.findByName(child.getName()).getParent();
+        return skillRepository.findByName(parent);
+    }
+
 
     private List<Skill> getSubclasses(String name){
         return skillRepository.findByParentName(name);
     }
+
+   public int getMaxDepth()
+   {   int max=0;
+       List<Skill> skills=skillRepository.findAll();
+       for(Skill s: skills)
+       {
+           if(getDepth(s)>max)
+               max=getDepth(s);
+       }
+       return max;
+   }
 }

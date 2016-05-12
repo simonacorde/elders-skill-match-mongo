@@ -38,6 +38,8 @@ public class MatchingService {
     private ParallelMatcher parallelMatcher;
     @Autowired
     private MatchingResultRepository matchingResultRepository;
+    @Autowired
+    private ParallelMatcher parallelPSOMatcher;
 
     private List<Senior> getElderCVs(int size){
         Iterator<Senior> all = elderRepository.findAll().iterator();
@@ -67,6 +69,24 @@ public class MatchingService {
         //OptimizationResult optimizationResult = optimizerService.applyOptimization(matchingResultRepository.findOne("5728d761bba552f756fd132c").getElders());
         LOGGER.info("Matching score : {} with a number of {} elders!", optimizationResult.getMatchingScore(), optimizationResult.getElders().size());
         return optimizationResult;
+    }
+
+    public List<ElderDTO> computePSOEldersMatchingWithOpportunity(OpportunityDTO opportunity, int size) throws ExecutionException, InterruptedException {
+        List<Senior> elders = getElderCVs(size);
+        List<ElderDTO> eldersMatched = new ArrayList<>();
+        for(Senior elder : elders){
+            ElderDTO elderDTO = new ElderDTO(elder);
+            eldersMatched.add(elderDTO);
+        }
+        return parallelPSOMatcher.findMatchingCandidates(opportunity, eldersMatched, size);
+    }
+
+    public void applyPSOMatchingAlgorithm(int size) throws  ExecutionException, InterruptedException {
+        Opportunity opportunity = opportunityRepository.findAll().get(8);
+        OpportunityDTO opportunityDTO = new OpportunityDTO(opportunity);
+        LOGGER.info("Applying matching algorithm for opportunity: {} with a number of {} elders.", opportunityDTO, size);
+        OptimizationResult optimizationResult = optimizerService.applyOptimization(computePSOEldersMatchingWithOpportunity(opportunityDTO, size));
+        LOGGER.info("Matching score : {} with a number of {} elders!", optimizationResult.getMatchingScore(), optimizationResult.getElders().size());
     }
 
     private List<Senior> randomList(List<Senior> seniors, int size){
