@@ -6,7 +6,6 @@ import diploma.elders.up.dao.repository.SkillRepository;
 import diploma.elders.up.dao.repository.UserRepository;
 import diploma.elders.up.data.DataGenerator;
 import diploma.elders.up.ontology.OntologyReader;
-import diploma.elders.up.semantic.matching.PSOMatchingAlgorithm;
 import diploma.elders.up.service.MatchingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,9 +41,6 @@ public class EldersSkillMatchApplication {
     private MatchingResultRepository matchingResultRepository;
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private PSOMatchingAlgorithm pso;
-
 
     @Bean
     public CommandLineRunner demo() {

@@ -38,8 +38,6 @@ public class MatchingService {
     private ParallelMatcher parallelMatcher;
     @Autowired
     private MatchingResultRepository matchingResultRepository;
-    @Autowired
-    private ParallelMatcher parallelPSOMatcher;
 
     private List<Senior> getElderCVs(int size){
         Iterator<Senior> all = elderRepository.findAll().iterator();
@@ -78,7 +76,7 @@ public class MatchingService {
             ElderDTO elderDTO = new ElderDTO(elder);
             eldersMatched.add(elderDTO);
         }
-        return parallelPSOMatcher.findMatchingCandidates(opportunity, eldersMatched, size);
+        return parallelMatcher.findMatchingCandidates(opportunity, eldersMatched, size);
     }
 
     public void applyPSOMatchingAlgorithm(int size) throws  ExecutionException, InterruptedException {
