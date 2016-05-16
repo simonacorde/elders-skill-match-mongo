@@ -46,8 +46,10 @@ public class OntologyLikeOperations {
                 class1 = parent1;
 
             }
-            parent2 = getParent(class2).getName();
-            if (!parent2.equals(THING) && !classesList1.contains(class2)) {
+                parent2 = getParent(class2).getName();
+
+
+            if (parent2 !=null &&!parent2.equals(THING) && !classesList1.contains(class2)) {
                 classesList2.add(parent2);
                 class2 = parent2;
             }
@@ -56,6 +58,20 @@ public class OntologyLikeOperations {
 
         return classesList1.size()-1 + classesList2.size() - 1;
     }
+    public int getDistance2(Skill skill1, Skill skill2)
+    {
+        if(skill1.equals(skill2))
+            return 0;
+        else if(isAncestor(skill1,skill2))
+                return getAncestorHierarchy(skill1,skill2).size()+1;
+             else if(isAncestor(skill2,skill1))
+                return getAncestorHierarchy(skill2,skill1).size()+1;
+                    else
+                        {
+                            Skill commonAncestor = getLeastCommonAncestor(skill1, skill2);
+                            return getAncestorHierarchy(commonAncestor, skill1).size() + getAncestorHierarchy(commonAncestor, skill2).size() + 2;
+                        }
+        }
 
     public boolean isAncestor(Skill ancestorSkill, Skill childSkill){
         String ancestor = ancestorSkill.getName();

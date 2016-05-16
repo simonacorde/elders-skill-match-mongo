@@ -74,7 +74,7 @@ public class PSOMatchingAlgorithm implements OntologySemanticMatcher  {
             for(Skill s:reverseHierarchy)           {
                 sum=sum+subsumeFunction(s,skill2);
             }
-            return (getConceptMatchScore(skill1,skill2)*sum)*((MAX_DEPTH+1)/2.0)/Math.pow(ontologyOperations.getDistance(skill1.getName(),skill2.getName()),2);
+            return ((getConceptMatchScore(skill1,skill2)*sum)*MAX_DEPTH)/Math.pow(ontologyOperations.getDistance2(skill1,skill2),2);
 
         }
 
@@ -84,7 +84,7 @@ public class PSOMatchingAlgorithm implements OntologySemanticMatcher  {
     public double siblingFunction(Skill skill1 ,Skill skill2)
     {
         Skill commonAncestor=ontologyOperations.getLeastCommonAncestor(skill1,skill2);
-        return (subsumeFunction(skill1,commonAncestor)+subsumeFunction(skill2,commonAncestor))/Math.pow(ontologyOperations.getDistance(skill1.getName(),skill2.getName()),2);
+        return (subsumeFunction(skill1,commonAncestor)+subsumeFunction(skill2,commonAncestor))/ontologyOperations.getDistance2(skill1,skill2)*2;
     }
 
 
