@@ -44,6 +44,11 @@ public class ElderController {
         return "login";
     }
 
+    @RequestMapping(value = "/back", method = RequestMethod.POST)
+    public String back() {
+        return "hello";
+    }
+
     @RequestMapping(value = "/match", method = RequestMethod.POST)
     public String match(@ModelAttribute("size") String size, @ModelAttribute("offerId") String offerId, ModelMap model) throws ExecutionException, InterruptedException {
         OptimizationResult optimizationResult = matchingService.applyMatchingAlgorithm(Integer.parseInt(size), offerId);
