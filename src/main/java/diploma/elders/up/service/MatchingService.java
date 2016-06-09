@@ -79,12 +79,13 @@ public class MatchingService {
         return parallelMatcher.findMatchingCandidates(opportunity, eldersMatched, size);
     }
 
-    public void applyPSOMatchingAlgorithm(int size) throws  ExecutionException, InterruptedException {
-        Opportunity opportunity = opportunityRepository.findAll().get(8);
+    public OptimizationResult applyPSOMatchingAlgorithm(int size,String opportunityId) throws  ExecutionException, InterruptedException {
+        Opportunity opportunity = opportunityRepository.findOne(opportunityId);
         OpportunityDTO opportunityDTO = new OpportunityDTO(opportunity);
         LOGGER.info("Applying matching algorithm for opportunity: {} with a number of {} elders.", opportunityDTO, size);
         OptimizationResult optimizationResult = optimizerService.applyOptimization(computePSOEldersMatchingWithOpportunity(opportunityDTO, size));
         LOGGER.info("Matching score : {} with a number of {} elders!", optimizationResult.getMatchingScore(), optimizationResult.getElders().size());
+        return optimizationResult;
     }
 
     private List<Senior> randomList(List<Senior> seniors, int size){

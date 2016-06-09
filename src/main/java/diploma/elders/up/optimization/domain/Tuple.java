@@ -10,6 +10,8 @@ public class Tuple {
 
     private ElderDTO elder;
     private boolean isInBin;
+    public Tuple() {
+    }
 
     public Tuple(ElderDTO elder, boolean isInBin) {
         this.elder = elder;
