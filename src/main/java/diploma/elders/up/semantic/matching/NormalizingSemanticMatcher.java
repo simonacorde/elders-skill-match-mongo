@@ -15,6 +15,9 @@ public class NormalizingSemanticMatcher implements OntologySemanticMatcher {
     private OntologyLikeOperations ontologyOperations;
 
     public double matchSkills(Skill skill1, Skill skill2){
+        if(skill1.getName().equals(skill2.getName())){
+            return 1.0;
+        }
         int distance = ontologyOperations.getDistance(skill1.getName(), skill2.getName());
         return normalizeDistance((double)distance);
     }

@@ -33,6 +33,7 @@ public class BirdMatingOptimizerService implements OptimizerService{
     private static final int FEMALE_MATES = 3;
     private static final double MONOGAMOUS_BIRDS_PERCENTAGE = 0.5;
     private static final double MALE_POLYGYNY_BIRDS_PERCENTAGE = 0.2;
+    private static final double MCF = 0.9;
 
     @Override
     public OptimizationResult applyOptimization(List<ElderDTO> elders) {
@@ -141,12 +142,24 @@ public class BirdMatingOptimizerService implements OptimizerService{
     }
     private List<Genome> naturalSelectionOfGenes(Bird male, List<Bird> females) {
         Genome[] genome = new Genome[male.getGenome().size()];
+        List<Bird> birds = new ArrayList<>();
+        birds.add(male);
+        birds.addAll(females);
         for(int i=0; i < male.getGenome().size(); i++){
-            List<Bird> birds = new ArrayList<>();
-            birds.add(male);
-            birds.addAll(females);
             Genome maxGenome = findMaxOnPosition(birds, i);
             genome[i] = maxGenome;
+        }
+        return applyMutation(birds, genome, male.getGenome().size());
+    }
+
+    private List<Genome> applyMutation(List<Bird> birds, Genome[] genome, int size) {
+        Random rand = new Random();
+        int randomGenePos = rand.nextInt(size);
+        double randomSubunitNr = rand.nextDouble();
+        if(randomSubunitNr > MCF) {
+            int randomBirdGenePos = rand.nextInt(birds.size());
+            Genome randomGenome = birds.stream().map(b -> b.getGenome().get(randomGenePos)).collect(Collectors.toList()).get(randomBirdGenePos);
+            genome[randomGenePos] = randomGenome;
         }
         return Arrays.asList(genome);
     }
