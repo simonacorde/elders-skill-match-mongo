@@ -102,9 +102,9 @@
     Welcome to Elders UP!
 </div>
 <div class="login-block">
-    <form th:action="@{/login}" method="post">
-        <input type="text" name="username" placeholder="Username" id="username"/>
-        <input type="password" name="password" placeholder="Password" id="password"/>
+    <form name="myForm" th:action="@{/login}" method="post">
+        <input type="text" name="username"  placeholder="Username" id="username" required="required" />
+        <input type="password" name="password" placeholder="Password" id="password" required="required" />
         <div class="form-actions">
             <button type="submit" class="btn">Sign In</button>
         </div>
