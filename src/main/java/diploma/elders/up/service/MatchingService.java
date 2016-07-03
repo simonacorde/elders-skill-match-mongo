@@ -15,10 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -27,6 +24,12 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class MatchingService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MatchingService.class);
+    private static final List<String> matchingOfferIds = Arrays.asList(
+            "57191978ecdb87be09518a80",
+            "57191978ecdb87be09518a82",
+            "57191978ecdb87be09518a83",
+            "57191978ecdb87be09518a86",
+            "57191979ecdb87be09518a88");
 
     @Autowired
     private SeniorRepository elderRepository;
@@ -59,12 +62,11 @@ public class MatchingService {
     }
 
     public OptimizationResult applyMatchingAlgorithm(int size, String opportunityId) throws ExecutionException, InterruptedException {
-        //Opportunity opportunity = opportunityRepository.findAll().get(28);
         Opportunity opportunity = opportunityRepository.findOne(opportunityId);
         OpportunityDTO opportunityDTO = new OpportunityDTO(opportunity);
         LOGGER.info("Applying matching algorithm for opportunity: {} with a number of {} elders.", opportunityDTO, size);
-        OptimizationResult optimizationResult = optimizerService.applyOptimization(computeEldersMatchingWithOpportunity(opportunityDTO, size));
-        //OptimizationResult optimizationResult = optimizerService.applyOptimization(matchingResultRepository.findOne("5728d761bba552f756fd132c").getElders());
+        //OptimizationResult optimizationResult = optimizerService.applyOptimization(computeEldersMatchingWithOpportunity(opportunityDTO, size));
+        OptimizationResult optimizationResult = optimizerService.applyOptimization(matchingResultRepository.findByOpportunityId(opportunityId).getElders().subList(0, size));
         LOGGER.info("Matching score : {} with a number of {} elders!", optimizationResult.getMatchingScore(), optimizationResult.getElders().size());
         return optimizationResult;
     }
@@ -96,5 +98,13 @@ public class MatchingService {
             generated.add(seniors.get(next));
         }
         return generated;
+    }
+
+    public List<Opportunity> getAvailableOpportunites(){
+        List<Opportunity> opportunities = new ArrayList<>();
+        for(String oppId: matchingOfferIds) {
+            opportunities.add(opportunityRepository.findOne(oppId));
+        }
+        return opportunities;
     }
 }

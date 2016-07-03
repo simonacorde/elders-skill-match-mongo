@@ -7,4 +7,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
  * Created by Simonas on 4/25/2016.
  */
 public interface MatchingResultRepository extends MongoRepository<MatchingResult, String>{
+    MatchingResult findByOpportunityId(String opportunityId);
 }

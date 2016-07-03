@@ -32,6 +32,10 @@ public class Senior {
         this.skills = skills;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override
     public String toString() {
         return "Senior{" +
