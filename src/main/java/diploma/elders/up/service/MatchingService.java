@@ -1,5 +1,7 @@
 package diploma.elders.up.service;
 
+import diploma.elders.up.NotFoundException;
+import diploma.elders.up.ValidationException;
 import diploma.elders.up.dao.documents.Opportunity;
 import diploma.elders.up.dao.documents.OptimizationResult;
 import diploma.elders.up.dao.documents.Senior;
@@ -61,7 +63,8 @@ public class MatchingService {
         return parallelMatcher.findMatchingCandidates(opportunity, eldersMatched, size);
     }
 
-    public OptimizationResult applyMatchingAlgorithm(int size, String opportunityId) throws ExecutionException, InterruptedException {
+    public OptimizationResult applyMatchingAlgorithm(int size, String opportunityId) throws ExecutionException, InterruptedException, NotFoundException, ValidationException {
+        validateInput(size, opportunityId);
         Opportunity opportunity = opportunityRepository.findOne(opportunityId);
         OpportunityDTO opportunityDTO = new OpportunityDTO(opportunity);
         LOGGER.info("Applying matching algorithm for opportunity: {} with a number of {} elders.", opportunityDTO, size);
@@ -69,6 +72,15 @@ public class MatchingService {
         OptimizationResult optimizationResult = optimizerService.applyOptimization(matchingResultRepository.findByOpportunityId(opportunityId).getElders().subList(0, size));
         LOGGER.info("Matching score : {} with a number of {} elders!", optimizationResult.getMatchingScore(), optimizationResult.getElders().size());
         return optimizationResult;
+    }
+
+    private void validateInput(int size, String opportunityId) throws ValidationException, NotFoundException {
+        if(size > 1000 || size <=0){
+            throw new ValidationException("Value=" + size + " of size is not acceptable!");
+        }
+        if(!matchingOfferIds.contains(opportunityId)){
+            throw new NotFoundException("Opportunity with id:" + opportunityId + " was not found!");
+        }
     }
 
     public List<ElderDTO> computePSOEldersMatchingWithOpportunity(OpportunityDTO opportunity, int size) throws ExecutionException, InterruptedException {

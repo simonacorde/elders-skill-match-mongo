@@ -1,5 +1,7 @@
 package diploma.elders.up.controller;
 
+import diploma.elders.up.NotFoundException;
+import diploma.elders.up.ValidationException;
 import diploma.elders.up.dao.documents.Opportunity;
 import diploma.elders.up.dao.documents.OptimizationResult;
 import diploma.elders.up.dao.documents.Senior;
@@ -50,7 +52,7 @@ public class ElderController {
     }
 
     @RequestMapping(value = "/match", method = RequestMethod.POST)
-    public String match(@ModelAttribute("size") String size, @ModelAttribute("offerId") String offerId, ModelMap model) throws ExecutionException, InterruptedException {
+    public String match(@ModelAttribute("size") String size, @ModelAttribute("offerId") String offerId, ModelMap model) throws ExecutionException, InterruptedException, NotFoundException, ValidationException {
         OptimizationResult optimizationResult = matchingService.applyMatchingAlgorithm(Integer.parseInt(size), offerId);
         model.addAttribute("score", optimizationResult.getMatchingScore());
         model.addAttribute("skill", new Skill());
@@ -61,7 +63,7 @@ public class ElderController {
 
     @RequestMapping(value = "/offers", method = RequestMethod.GET)
     public String listOffers( ModelMap model) {
-        List<Opportunity> opportunities = opportunityRepository.findAll().subList(0, 5);
+        List<Opportunity> opportunities = matchingService.getAvailableOpportunites();
         model.addAttribute("offer", new Opportunity());
         model.addAttribute("skill", new Skill());
         model.addAttribute("offer", new Opportunity());
